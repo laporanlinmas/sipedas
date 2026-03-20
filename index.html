@@ -2,36 +2,20 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <!--
-    ✅ FIX: viewport tidak pakai maximum-scale=1 / user-scalable=no
-    Alasan: Google menganggap itu tanda phishing (mencegah user zoom untuk
-    memeriksa URL). Aksesibilitas juga lebih baik tanpa pembatasan ini.
-  -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!--
-    ✅ FIX: Meta tags yang membantu Google Safe Browsing mengenali situs resmi.
-    Tanpa ini, situs baru dengan form login + logo pemerintah sangat mudah
-    dikira phishing.
-  -->
   <meta name="description" content="SI-PEDAS — Sistem Informasi Pedestrian Satlinmas. Dashboard monitoring patroli dan laporan resmi Bidang SDA dan Linmas.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-
-  <!--
-    ✅ FIX: CSP di meta sebagai fallback (header vercel.json tetap prioritas utama)
-    form-action 'self' = form login HANYA bisa submit ke domain sendiri,
-    bukan ke domain luar → ini BUKTI ke Google bahwa ini bukan phishing form.
-  -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com cdnjs.cloudflare.com; font-src 'self' fonts.gstatic.com cdnjs.cloudflare.com; img-src 'self' data: blob: upload.wikimedia.org *; connect-src 'self' *; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 
   <title>SI-PEDAS — Sistem Informasi Pedestrian Satlinmas</title>
 
   <!-- FAVICON -->
-  <link rel="icon"             href="/icon-32.png"  sizes="32x32"   type="image/png">
-  <link rel="icon"             href="/icon-192.png" sizes="192x192" type="image/png">
-  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="icon" href="/public/icon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/public/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/public/icon-192.png">
+  <link rel="shortcut icon" href="/public/icon-32.png">
 
   <!-- FONT — preconnect dulu agar lebih cepat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
