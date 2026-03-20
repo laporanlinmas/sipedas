@@ -1449,7 +1449,7 @@ async function _buildPdfDocument(mapCanvas,tglStr,jamStr,tileConf,done){
 
   // Logo (fetch dengan cache)
   if(!_logoCacheB64){
-    try{ _logoCacheB64=await _imgToBase64('https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Linmas_Logo.png/960px-Linmas_Logo.png'); }
+    try{ _logoCacheB64=await _imgToBase64('assets/icon-full.png'); }
     catch(e){ console.warn('Logo gagal:',e); }
   }
 
