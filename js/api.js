@@ -1,11 +1,8 @@
 // ================================================================
-//  api.js — Helper fetch ke GAS Backend
-//  Ganti: google.script.run.withSuccessHandler(fn).namaFungsi(payload)
-//  Jadi : apiGet('action', params).then(fn) / apiPost('action', payload).then(fn)
+//  js/api.js — Helper fetch ke Vercel Proxy
+//  Request tidak langsung ke GAS (kena CORS)
+//  Sekarang lewat /api/proxy yang jalan di server Vercel
 // ================================================================
-
-var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzAEfh3QcfsgGVgRSiq7QVXwDCP0ATzRcsyuMjbyE5t7zJUquk4Ms_bc3Mc0MLRf8NZ/exec';
-var API_KEY      = 'BASITH';
 
 // Titik akhir proxy — jalan di server Vercel, tidak kena CORS
 var PROXY_URL = '/api/proxy';
@@ -47,4 +44,3 @@ function apiPost(action, payload) {
       return { success: false, message: e.message };
     });
 }
-
