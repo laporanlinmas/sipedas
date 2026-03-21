@@ -3,45 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" id="mvp">
-
-<!-- =============================================
-     SECURITY META TAGS
-     ============================================= -->
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private">
-<meta http-equiv="Pragma" content="no-cache">
-<meta name="description" content="Sistem Informasi Pedestrian Satlinmas — Dashboard monitoring resmi Bidang SDA dan Linmas.">
-<meta name="robots" content="noindex, nofollow">
-
 <title>SI-PEDAS — Sistem Informasi Pedestrian Satlinmas</title>
-
 <!-- FAVICON -->
 <link rel="icon" href="/assets/icon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
 <link rel="shortcut icon" href="/assets/icon-32.png">
-
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+<!-- CSS kamu -->
 <link rel="stylesheet" href="css/style.css">
+
 </head>
 <body>
 
+<!-- JS kamu — urutan penting -->
 <script src="js/api.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/laporan.js"></script>
 <script src="js/peta.js"></script>
 
+<!-- LOADING OVERLAY -->
 <div id="lov"><div class="spw"><div class="spo"></div><div class="spi"></div></div><span id="lmsg">Memuat...</span></div>
 <div id="tco"></div>
 
+<!-- GALLERY -->
 <div id="gov">
   <button id="gcl" onclick="galClose()">&times;</button>
   <div id="gcnt">1 / 1</div>
@@ -52,9 +40,10 @@
     <button class="gnav" id="gnx" onclick="galNav(1)"><i class="fas fa-chevron-right"></i></button>
   </div>
   <div id="gths"></div>
-  <div id="gdrvlink"><a href="#" id="gdrvhref" target="_blank" rel="noopener noreferrer"><i class="fab fa-google-drive"></i> Buka di Google Drive</a></div>
+  <div id="gdrvlink"><a href="#" id="gdrvhref" target="_blank" rel="noopener"><i class="fab fa-google-drive"></i> Buka di Google Drive</a></div>
 </div>
 
+<!-- MODALS -->
 <div class="mov" id="medit">
   <div class="mbox">
     <div class="mhd"><h5><i class="fas fa-pen-to-square" style="color:var(--blue)"></i>Edit Laporan</h5><button class="bx" onclick="cm('medit')">&times;</button></div>
@@ -79,6 +68,7 @@
   </div>
 </div>
 
+<!-- MODAL PDF -->
 <div class="mov" id="mpdf">
   <div class="mbox xl">
     <div class="mhd">
@@ -122,15 +112,14 @@
           </div>
           <button class="bp" style="width:100%" onclick="refreshPdfPreview()"><i class="fas fa-sync"></i> Perbarui Preview</button>
         </div>
-        <div style="background:#e8e8e8">
-          <iframe id="pdfframe" style="width:100%;height:100%;border:none" title="Preview PDF Laporan" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
-        </div>
+        <div style="background:#e8e8e8"><iframe id="pdfframe" style="width:100%;height:100%;border:none"></iframe></div>
       </div>
     </div>
     <div class="mft"><button class="bg2" onclick="cm('mpdf')">Tutup</button><button class="bp" onclick="doPrint('pdfframe')"><i class="fas fa-print"></i> Cetak / PDF</button></div>
   </div>
 </div>
 
+<!-- Modal Kolektif -->
 <div class="mov" id="mkolektif">
   <div class="mbox xl">
     <div class="mhd"><h5><i class="fas fa-print" style="color:var(--purple)"></i>Cetak Laporan Kolektif</h5><button class="bx" onclick="cm('mkolektif')">&times;</button></div>
@@ -149,7 +138,7 @@
             <i class="fas fa-file-lines" style="font-size:2.4rem;opacity:.18"></i>
             <p style="font-size:.76rem">Pilih rentang tanggal lalu klik Perbarui Preview</p>
           </div>
-          <iframe id="kolframe" style="width:100%;height:100%;border:none;display:none" title="Preview Laporan Kolektif" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+          <iframe id="kolframe" style="width:100%;height:100%;border:none;display:none"></iframe>
         </div>
       </div>
     </div>
@@ -157,6 +146,7 @@
   </div>
 </div>
 
+<!-- Modal Edit Layer Peta -->
 <div class="mov" id="mlayer">
   <div class="mbox xl" style="max-width:720px">
     <div class="mhd">
@@ -188,11 +178,14 @@
     </div>
     <div class="mft">
       <button class="bg2" onclick="cm('mlayer')">Tutup</button>
-      <button class="bp" onclick="refreshLeaflet()"><i class="fas fa-sync"></i> Refresh Peta</button>
+      <button class="bp" onclick="refreshLeaflet()">
+        <i class="fas fa-sync"></i> Refresh Peta
+      </button>
     </div>
   </div>
 </div>
 
+<!-- Modal Konfirm Hapus Layer -->
 <div class="mov" id="mconfLayer" style="z-index:100000">
   <div class="mbox sm">
     <div class="mhd"><h5 style="color:var(--red)"><i class="fas fa-triangle-exclamation"></i> Hapus Layer</h5><button class="bx" onclick="cm('mconfLayer')">&times;</button></div>
@@ -209,7 +202,7 @@
     <button id="lvm-btn" onclick="toggleViewMode()" title="Ganti Mode Tampilan"><i id="lvm-ico" class="fas fa-mobile-alt"></i></button>
     <div class="lcard">
       <div class="llgo">
-        <img src="assets/icon-full.png" alt="Logo Satlinmas Resmi">
+        <img src="assets/icon-full.png" alt="Logo Linmas">
         <div class="lsipedas-wrap">
           <div class="lsipedas">SI-PEDAS</div>
           <div class="lsipedas-hr"></div>
@@ -217,13 +210,13 @@
         <div class="lsubtitle">Dashboard Monitoring<br><strong>SISTEM INFORMASI PEDESTRIAN SATLINMAS</strong></div>
       </div>
       <div id="lerr"><i class="fas fa-circle-exclamation"></i> <span id="lerrmsg"></span></div>
-      <label class="llbl" for="iu">Username</label>
+      <label class="llbl">Username</label>
       <div class="liwrap"><i class="fas fa-user"></i><input id="iu" class="linp" type="text" placeholder="Masukkan username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('ip').focus()"></div>
-      <label class="llbl" for="ip">Password</label>
+      <label class="llbl">Password</label>
       <div class="liwrap"><i class="fas fa-lock"></i><input id="ip" class="linp" type="password" placeholder="Masukkan password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-        <button class="eyetog" onclick="toggleEye()" type="button" aria-label="Tampilkan/sembunyikan password"><i class="fas fa-eye" id="eyeico"></i></button>
+        <button class="eyetog" onclick="toggleEye()"><i class="fas fa-eye" id="eyeico"></i></button>
       </div>
-      <button class="lbtn" onclick="doLogin()" id="lbtn" type="button"><i class="fas fa-right-to-bracket"></i> Masuk</button>
+      <button class="lbtn" onclick="doLogin()" id="lbtn"><i class="fas fa-right-to-bracket"></i> Masuk</button>
       <p style="text-align:center;font-size:.57rem;color:rgba(255,255,255,.11);margin-top:16px">© 2026 Bidang SDA dan Linmas</p>
     </div>
   </div>
@@ -285,7 +278,9 @@
   </div>
 </div>
 
+<!-- Init app setelah semua script dimuat -->
 <script>
+  // Cek session yang tersimpan (agar tidak logout saat refresh)
   (function(){
     try {
       var saved = sessionStorage.getItem('_slm');
