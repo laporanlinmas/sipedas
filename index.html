@@ -4,115 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" id="mvp">
 
-<!-- ============================================================
+<!-- =============================================
      SECURITY META TAGS
-     Mengurangi risiko flagging phishing & XSS oleh browser/Google
-     ============================================================ -->
-
-<!-- 1. Content Security Policy — batasi sumber resource yang boleh dimuat -->
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src  'self' 'unsafe-inline'
-              https://cdn.jsdelivr.net
-              https://cdnjs.cloudflare.com;
-  style-src   'self' 'unsafe-inline'
-              https://fonts.googleapis.com
-              https://cdnjs.cloudflare.com;
-  font-src    'self'
-              https://fonts.gstatic.com
-              https://cdnjs.cloudflare.com;
-  img-src     'self' data: blob:
-              https://lh3.googleusercontent.com
-              https://drive.google.com;
-  connect-src 'self'
-              https://script.google.com
-              https://script.googleusercontent.com;
-  frame-src   'self' blob:;
-  object-src  'none';
-  base-uri    'self';
-  form-action 'self';
-">
-
-<!-- 2. Cegah MIME-type sniffing -->
+     ============================================= -->
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
-
-<!-- 3. Referrer Policy — jangan bocorkan URL ke pihak ketiga -->
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-
-<!-- 4. Permissions Policy — nonaktifkan fitur browser yang tidak perlu -->
-<meta http-equiv="Permissions-Policy" content="
-  geolocation=(self),
-  camera=(),
-  microphone=(),
-  payment=(),
-  usb=()
-">
-
-<!-- 5. Identitas situs yang jelas — membantu Google Safe Browsing memverifikasi -->
-<meta name="description" content="SI-PEDAS — Sistem Informasi Pedestrian Satlinmas. Dashboard resmi monitoring patroli pedestrian Bidang SDA dan Linmas.">
-<meta name="author"      content="Bidang SDA dan Linmas">
-<meta name="robots"      content="noindex, nofollow">
-
-<!-- ============================================================
-     END SECURITY META TAGS
-     ============================================================ -->
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="description" content="Sistem Informasi Pedestrian Satlinmas — Dashboard monitoring resmi Bidang SDA dan Linmas.">
+<meta name="robots" content="noindex, nofollow">
 
 <title>SI-PEDAS — Sistem Informasi Pedestrian Satlinmas</title>
 
 <!-- FAVICON -->
-<link rel="icon"             href="/assets/icon-32.png"  sizes="32x32"  type="image/png">
-<link rel="icon"             href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="icon" href="/assets/icon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/icon-192.png">
-<link rel="shortcut icon"    href="/assets/icon-32.png">
+<link rel="shortcut icon" href="/assets/icon-32.png">
 
-<!-- FONTS — pakai display=swap & preconnect untuk performa -->
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com"   crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-<!--
-  Font Awesome 6.5.0 — SRI hash (sha512)
-  CARA VERIFIKASI SENDIRI:
-    curl -s https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css \
-      | openssl dgst -sha512 -binary | openssl base64 -A
-  Tempel hasil di integrity="sha512-HASIL_DI_SINI"
--->
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-      integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPDbkFwi6ZNXuijiZgxYca5GeD0WKiGnwNhJBBPpfYgrGFGbFKPmrg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer">
-
-<!--
-  Chart.js 4.4.0 — SRI hash
-  CARA VERIFIKASI SENDIRI:
-    curl -s https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js \
-      | openssl dgst -sha512 -binary | openssl base64 -A
--->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
-        integrity="sha512-ZQS9PNzEdFCTjx2M3gSwqNTkRPHVlS6mU/MuQdqRTCJk0JxVKfVLRWAhC9pLbblDjGa1mM75MmEaSBg/tknA=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-        defer></script>
-
-<!-- CSS kamu -->
 <link rel="stylesheet" href="css/style.css">
-
 </head>
 <body>
 
-<!-- JS kamu — urutan penting -->
-<script src="js/api.js"     defer></script>
-<script src="js/ui.js"      defer></script>
-<script src="js/laporan.js" defer></script>
-<script src="js/peta.js"    defer></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/laporan.js"></script>
+<script src="js/peta.js"></script>
 
-<!-- LOADING OVERLAY -->
 <div id="lov"><div class="spw"><div class="spo"></div><div class="spi"></div></div><span id="lmsg">Memuat...</span></div>
 <div id="tco"></div>
 
-<!-- GALLERY -->
 <div id="gov">
   <button id="gcl" onclick="galClose()">&times;</button>
   <div id="gcnt">1 / 1</div>
@@ -123,11 +52,9 @@
     <button class="gnav" id="gnx" onclick="galNav(1)"><i class="fas fa-chevron-right"></i></button>
   </div>
   <div id="gths"></div>
-  <!-- noopener noreferrer pada SEMUA link eksternal -->
   <div id="gdrvlink"><a href="#" id="gdrvhref" target="_blank" rel="noopener noreferrer"><i class="fab fa-google-drive"></i> Buka di Google Drive</a></div>
 </div>
 
-<!-- MODALS -->
 <div class="mov" id="medit">
   <div class="mbox">
     <div class="mhd"><h5><i class="fas fa-pen-to-square" style="color:var(--blue)"></i>Edit Laporan</h5><button class="bx" onclick="cm('medit')">&times;</button></div>
@@ -152,7 +79,6 @@
   </div>
 </div>
 
-<!-- MODAL PDF -->
 <div class="mov" id="mpdf">
   <div class="mbox xl">
     <div class="mhd">
@@ -196,14 +122,15 @@
           </div>
           <button class="bp" style="width:100%" onclick="refreshPdfPreview()"><i class="fas fa-sync"></i> Perbarui Preview</button>
         </div>
-        <div style="background:#e8e8e8"><iframe id="pdfframe" style="width:100%;height:100%;border:none" title="Preview PDF Laporan" sandbox="allow-same-origin allow-scripts allow-modals allow-popups"></iframe></div>
+        <div style="background:#e8e8e8">
+          <iframe id="pdfframe" style="width:100%;height:100%;border:none" title="Preview PDF Laporan" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+        </div>
       </div>
     </div>
     <div class="mft"><button class="bg2" onclick="cm('mpdf')">Tutup</button><button class="bp" onclick="doPrint('pdfframe')"><i class="fas fa-print"></i> Cetak / PDF</button></div>
   </div>
 </div>
 
-<!-- Modal Kolektif -->
 <div class="mov" id="mkolektif">
   <div class="mbox xl">
     <div class="mhd"><h5><i class="fas fa-print" style="color:var(--purple)"></i>Cetak Laporan Kolektif</h5><button class="bx" onclick="cm('mkolektif')">&times;</button></div>
@@ -222,7 +149,7 @@
             <i class="fas fa-file-lines" style="font-size:2.4rem;opacity:.18"></i>
             <p style="font-size:.76rem">Pilih rentang tanggal lalu klik Perbarui Preview</p>
           </div>
-          <iframe id="kolframe" style="width:100%;height:100%;border:none;display:none" title="Preview Laporan Kolektif" sandbox="allow-same-origin allow-scripts allow-modals allow-popups"></iframe>
+          <iframe id="kolframe" style="width:100%;height:100%;border:none;display:none" title="Preview Laporan Kolektif" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
         </div>
       </div>
     </div>
@@ -230,7 +157,6 @@
   </div>
 </div>
 
-<!-- Modal Edit Layer Peta -->
 <div class="mov" id="mlayer">
   <div class="mbox xl" style="max-width:720px">
     <div class="mhd">
@@ -262,14 +188,11 @@
     </div>
     <div class="mft">
       <button class="bg2" onclick="cm('mlayer')">Tutup</button>
-      <button class="bp" onclick="refreshLeaflet()">
-        <i class="fas fa-sync"></i> Refresh Peta
-      </button>
+      <button class="bp" onclick="refreshLeaflet()"><i class="fas fa-sync"></i> Refresh Peta</button>
     </div>
   </div>
 </div>
 
-<!-- Modal Konfirm Hapus Layer -->
 <div class="mov" id="mconfLayer" style="z-index:100000">
   <div class="mbox sm">
     <div class="mhd"><h5 style="color:var(--red)"><i class="fas fa-triangle-exclamation"></i> Hapus Layer</h5><button class="bx" onclick="cm('mconfLayer')">&times;</button></div>
@@ -286,7 +209,7 @@
     <button id="lvm-btn" onclick="toggleViewMode()" title="Ganti Mode Tampilan"><i id="lvm-ico" class="fas fa-mobile-alt"></i></button>
     <div class="lcard">
       <div class="llgo">
-        <img src="assets/icon-full.png" alt="Logo Satlinmas">
+        <img src="assets/icon-full.png" alt="Logo Satlinmas Resmi">
         <div class="lsipedas-wrap">
           <div class="lsipedas">SI-PEDAS</div>
           <div class="lsipedas-hr"></div>
@@ -294,40 +217,22 @@
         <div class="lsubtitle">Dashboard Monitoring<br><strong>SISTEM INFORMASI PEDESTRIAN SATLINMAS</strong></div>
       </div>
       <div id="lerr"><i class="fas fa-circle-exclamation"></i> <span id="lerrmsg"></span></div>
-      <!--
-        autocomplete="username" dan "current-password" WAJIB ada
-        agar browser/password manager mengenali ini sebagai form login sah
-        (bukan phishing). Jangan diubah ke "off".
-      -->
       <label class="llbl" for="iu">Username</label>
-      <div class="liwrap">
-        <i class="fas fa-user" aria-hidden="true"></i>
-        <input id="iu" class="linp" type="text" placeholder="Masukkan username"
-               autocomplete="username" name="username"
-               onkeydown="if(event.key==='Enter')document.getElementById('ip').focus()">
-      </div>
+      <div class="liwrap"><i class="fas fa-user"></i><input id="iu" class="linp" type="text" placeholder="Masukkan username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('ip').focus()"></div>
       <label class="llbl" for="ip">Password</label>
-      <div class="liwrap">
-        <i class="fas fa-lock" aria-hidden="true"></i>
-        <input id="ip" class="linp" type="password" placeholder="Masukkan password"
-               autocomplete="current-password" name="password"
-               onkeydown="if(event.key==='Enter')doLogin()">
-        <button class="eyetog" onclick="toggleEye()" type="button" aria-label="Tampilkan/sembunyikan password">
-          <i class="fas fa-eye" id="eyeico"></i>
-        </button>
+      <div class="liwrap"><i class="fas fa-lock"></i><input id="ip" class="linp" type="password" placeholder="Masukkan password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="eyetog" onclick="toggleEye()" type="button" aria-label="Tampilkan/sembunyikan password"><i class="fas fa-eye" id="eyeico"></i></button>
       </div>
-      <button class="lbtn" onclick="doLogin()" id="lbtn" type="button">
-        <i class="fas fa-right-to-bracket"></i> Masuk
-      </button>
+      <button class="lbtn" onclick="doLogin()" id="lbtn" type="button"><i class="fas fa-right-to-bracket"></i> Masuk</button>
       <p style="text-align:center;font-size:.57rem;color:rgba(255,255,255,.11);margin-top:16px">© 2026 Bidang SDA dan Linmas</p>
     </div>
   </div>
 
   <!-- MAIN APP -->
   <div id="app">
-    <nav class="sb" id="sidebar" aria-label="Menu Navigasi">
+    <nav class="sb" id="sidebar">
       <div class="sbbr">
-        <img src="assets/icon-full.png" alt="Logo SI-PEDAS">
+        <img src="assets/icon-full.png" alt="">
         <div class="sipedas-glow-sb sb-sipedas">SI-PEDAS</div>
         <div class="sb-subtitle">Dashboard Monitoring<br>Sistem Informasi Pedestrian Satlinmas</div>
       </div>
@@ -337,7 +242,7 @@
         <button class="nb" id="nav-rk" onclick="loadRekap();sbClose()"><i class="fas fa-table-list"></i> Rekap Laporan</button>
         <button class="nb" id="nav-ed" onclick="loadEdit();sbClose()"><i class="fas fa-file-pen"></i> Edit Laporan</button>
         <button class="nb" id="nav-in" onclick="loadInput();sbClose()"><i class="fas fa-plus-circle"></i> Input Laporan</button>
-        <span class="nslbl">Data &amp; Peta</span>
+        <span class="nslbl">Data & Peta</span>
         <button class="nb" id="nav-sl" onclick="loadSatlinmas();sbClose()"><i class="fas fa-users"></i> Data Satlinmas</button>
         <button class="nb nb-peta" id="nav-pt" onclick="loadPeta();sbClose()"><i class="fas fa-map-location-dot"></i> Peta Pedestrian</button>
         <span class="nslbl sb-ptk-section">Panduan</span>
@@ -351,15 +256,15 @@
     <div class="main">
       <div class="topb">
         <div class="tbl">
-          <button class="hmb" onclick="sbToggle()" aria-label="Buka menu"><i class="fas fa-bars"></i></button>
+          <button class="hmb" onclick="sbToggle()"><i class="fas fa-bars"></i></button>
           <div>
             <div class="pgtl" id="pgtl">Dashboard</div>
-            <div class="pgsb" id="pgsb">Statistik &amp; grafik data patroli</div>
+            <div class="pgsb" id="pgsb">Statistik & grafik data patroli</div>
           </div>
         </div>
         <div class="tbr">
-          <button id="refresh-btn" onclick="doRefreshPage()" aria-label="Refresh halaman"><i class="fas fa-rotate-right"></i></button>
-          <button id="vm-btn" onclick="toggleViewMode()" data-tip="Ganti Mode" aria-label="Ganti mode tampilan"><i id="vm-ico" class="fas fa-mobile-alt"></i></button>
+          <button id="refresh-btn" onclick="doRefreshPage()"><i class="fas fa-rotate-right"></i></button>
+          <button id="vm-btn" onclick="toggleViewMode()" data-tip="Ganti Mode"><i id="vm-ico" class="fas fa-mobile-alt"></i></button>
           <div class="tb-acct" id="tb-acct" style="display:none">
             <div class="tb-av" id="tb-av">?</div>
             <div><div class="tb-un" id="tb-un">—</div><div class="tb-rl" id="tb-rl">—</div></div>
@@ -368,7 +273,7 @@
         </div>
       </div>
       <div class="pa" id="ct"></div>
-      <nav class="bnav" id="bnav" aria-label="Navigasi bawah">
+      <nav class="bnav" id="bnav">
         <button class="bni on" id="bni-db" onclick="loadDashboard()"><i class="fas fa-gauge-high"></i>Dashboard</button>
         <button class="bni" id="bni-rk" onclick="loadRekap()"><i class="fas fa-table-list"></i>Rekap</button>
         <button class="bni" id="bni-in" onclick="loadInput()"><i class="fas fa-plus-circle"></i>Input</button>
@@ -380,32 +285,8 @@
   </div>
 </div>
 
-<!--
-  ============================================================
-  CATATAN UNTUK VERCEL / SERVER HOSTING
-  ============================================================
-  Tambahkan HTTP Security Headers di vercel.json:
-  {
-    "headers": [
-      {
-        "source": "/(.*)",
-        "headers": [
-          { "key": "X-Content-Type-Options",   "value": "nosniff" },
-          { "key": "X-Frame-Options",           "value": "SAMEORIGIN" },
-          { "key": "X-XSS-Protection",          "value": "1; mode=block" },
-          { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
-          { "key": "Referrer-Policy",           "value": "strict-origin-when-cross-origin" },
-          { "key": "Permissions-Policy",        "value": "camera=(), microphone=(), payment=()" }
-        ]
-      }
-    ]
-  }
-  ============================================================
--->
-
-<!-- Session restore — dijalankan setelah semua script defer selesai -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  (function(){
     try {
       var saved = sessionStorage.getItem('_slm');
       if (saved) {
@@ -415,11 +296,9 @@
         document.getElementById('app').classList.add('on');
         loadDashboard();
       }
-    } catch (e) {
-      sessionStorage.removeItem('_slm'); // buang session korup
-    }
-    if (typeof applyViewMode === 'function') applyViewMode();
-  });
+    } catch(e) {}
+    applyViewMode();
+  })();
 </script>
 
 </body>
