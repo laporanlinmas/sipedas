@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SI-PEDAS — Sistem Informasi Pedestrian Satlinmas</title>
+  <!-- FAVICON -->
+<link rel="icon" href="/assets/icon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/icon-192.png">
+<link rel="shortcut icon" href="/assets/icon-32.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- ═══ LOADING OVERLAY ═══════════════════════════════════ -->
+<div id="ld-ov">
+  <div class="ld-ring"><div class="ld-ico"><img src="assets/icon-192.png" alt=""></div></div>
+  <div class="ld-body">
+    <div id="ld-title">Mengirim Laporan...</div>
+    <div id="ld-sub">Mempersiapkan data...</div>
+    <div class="ld-bar"><div class="ld-fill" id="ld-bar"></div></div>
+    <div class="ld-steps">
+      <div class="ls" id="ls0"><i class="fas fa-file-lines"></i> Parse teks laporan</div>
+      <div class="ls" id="ls1"><i class="fas fa-cloud-arrow-up"></i> Upload foto ke Drive</div>
+      <div class="ls" id="ls2"><i class="fas fa-table-list"></i> Simpan ke Spreadsheet</div>
+      <div class="ls" id="ls3"><i class="fas fa-circle-check"></i> Selesai</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ALERT MODAL ════════════════════════════════════════ -->
+<div id="al-ov">
+  <div class="al-box">
+    <button class="al-close" onclick="closeAlert()"><i class="fas fa-times"></i></button>
+    <div class="al-ico" id="al-ico"><i id="al-ico-i" class="fas fa-check"></i></div>
+    <div class="al-title" id="al-title">Judul</div>
+    <div class="al-msg" id="al-msg">Pesan</div>
+    <button class="al-btn" id="al-btn" onclick="closeAlert()">OK</button>
+  </div>
+</div>
+
+<!-- ═══ VIEWER (LIGHTBOX) ══════════════════════════════════ -->
+<div id="vw-ov">
+  <div class="vw-top">
+    <span class="vw-ttl" id="vw-title">Foto 1</span>
+    <button class="vw-close" onclick="closeViewer()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="vw-img-wrap"><img id="vw-img" src="" alt="Preview"></div>
+  <div class="vw-bot">
+    <div class="vw-info" id="vw-info"></div>
+    <div class="vw-nav">
+      <button id="vw-map" class="vw-map-btn" title="Lihat di peta" style="display:none" onclick="viewerOpenMap()"><i class="fas fa-map-location-dot"></i></button>
+      <a id="vw-dl" class="vw-dl-btn" title="Download foto" style="display:none" download><i class="fas fa-download"></i></a>
+      <button id="vw-prev" onclick="viewerNav(-1)"><i class="fas fa-chevron-left"></i></button>
+      <button id="vw-next" onclick="viewerNav(1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAP MODAL ══════════════════════════════════════════ -->
+<div id="map-modal">
+  <div class="map-box">
+    <div class="map-head">
+      <h3><i class="fas fa-map-location-dot"></i> Peta Lokasi Foto</h3>
+      <button class="map-close" onclick="closeMapModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="map-info-text" id="map-info-text">Memuat informasi lokasi...</div>
+    <div class="map-iframe-wrap">
+      <iframe id="map-iframe" src="about:blank" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <div class="map-footer">
+      <button class="map-btn secondary" onclick="closeMapModal()"><i class="fas fa-times"></i> Tutup</button>
+      <button class="map-btn primary" id="map-gmaps-btn"><i class="fas fa-external-link-alt"></i> Google Maps</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DRAFT BOTTOM SHEET ═════════════════════════
+     Modal daftar draft tersimpan — diisi dinamis oleh loadDraftList()
+════════════════════════════════════════════════════════ -->
+<div id="draft-modal">
+  <div class="draft-sheet">
+    <div class="draft-sheet-handle"></div>
+    <div class="draft-sheet-hd">
+      <div class="draft-sheet-title">
+        <i class="fas fa-cloud-download-alt"></i>
+        Pilih Draft Tersimpan
+      </div>
+      <button class="draft-sheet-close" onclick="closeDraftModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="draft-sheet-body" id="draft-modal-body">
+      <!-- Diisi oleh JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS BOTTOM SHEET ══════════════════════════════ -->
+<div id="set-ov" onclick="setOvClick(event)">
+  <div class="set-sheet">
+    <div class="set-handle"></div>
+    <div class="set-hdr">
+      <h2><i class="fas fa-gear"></i> Pengaturan</h2>
+      <button class="set-close" onclick="closeSet()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="set-body">
+
+      <!-- Fitur Toggle -->
+      <div class="set-sec">
+        <div class="set-sec-ttl">Fitur</div>
+
+        <!-- Toggle watermark KAMERA (menggantikan toggle #t-wm tunggal) -->
+        <div class="tog-row">
+          <div class="tog-left">
+            <i class="fas fa-camera" style="color:var(--gold)"></i>
+            <div class="tog-info">
+              <div class="tl">Watermark Foto Kamera</div>
+              <div class="ts">Cap otomatis + QR pada foto kamera</div>
+            </div>
+          </div>
+          <label class="tog-sw">
+            <input type="checkbox" id="t-wm-cam" checked onchange="saveSets()">
+            <div class="ts-track"><div class="ts-knob"></div></div>
+          </label>
+        </div>
+
+        <!-- Toggle watermark GALERI -->
+        <div class="tog-row">
+          <div class="tog-left">
+            <i class="fas fa-images" style="color:#7ab3ff"></i>
+            <div class="tog-info">
+              <div class="tl">Watermark Foto Galeri</div>
+              <div class="ts">Cap otomatis pada foto dari galeri</div>
+            </div>
+          </div>
+          <label class="tog-sw">
+            <input type="checkbox" id="t-wm-gal" checked onchange="saveSets()">
+            <div class="ts-track"><div class="ts-knob"></div></div>
+          </label>
+        </div>
+
+        <div class="tog-row">
+          <div class="tog-left">
+            <i class="fas fa-map-location-dot" style="color:var(--green)"></i>
+            <div class="tog-info">
+              <div class="tl">Mini Map Lokasi</div>
+              <div class="ts">Tampilkan peta dari koordinat EXIF</div>
+            </div>
+          </div>
+          <label class="tog-sw">
+            <input type="checkbox" id="t-map" checked onchange="saveSets()">
+            <div class="ts-track"><div class="ts-knob"></div></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Lokasi Manual -->
+      <div class="set-sec">
+        <div class="set-sec-ttl">Lokasi Manual (Fallback Kamera &amp; Galeri)</div>
+        <div class="coll-hdr" id="loc-hdr" onclick="togColl('loc')">
+          <div class="coll-ttl"><i class="fas fa-map-pin"></i> Input Lokasi Manual</div>
+          <i class="fas fa-chevron-down coll-arr"></i>
+        </div>
+        <div class="coll-body" id="loc-body">
+          <div class="loc-grid">
+            <div class="loc-row"><span class="loc-lbl">Jalan</span><input class="loc-inp" id="lc-jalan" type="text" placeholder="Nama jalan / gang" oninput="saveSets()"></div>
+            <div class="loc-row"><span class="loc-lbl">No/Dukuh</span><input class="loc-inp" id="lc-nodukuh" type="text" placeholder="No.xx / Dukuh xx" oninput="saveSets()"></div>
+            <div class="loc-row"><span class="loc-lbl">Desa/Kel</span><input class="loc-inp" id="lc-desa" type="text" placeholder="Desa / Kelurahan" oninput="saveSets()"></div>
+            <div class="loc-row"><span class="loc-lbl">Kecamatan</span><input class="loc-inp" id="lc-kec" type="text" placeholder="Kecamatan" oninput="saveSets()"></div>
+            <div class="loc-row"><span class="loc-lbl">Kabupaten</span><input class="loc-inp" id="lc-kab" type="text" value="Ponorogo" oninput="saveSets()"></div>
+            <div class="loc-row"><span class="loc-lbl">Provinsi</span><input class="loc-inp" id="lc-prov" type="text" value="Jawa Timur" oninput="saveSets()"></div>
+            <div class="loc-row"><span class="loc-lbl">Negara</span><span class="loc-flag">🇮🇩</span><input class="loc-inp" type="text" value="Indonesia" disabled></div>
+          </div>
+          <div class="coord-row">
+            <div class="coord-box"><span class="coord-lbl">Lat Manual</span><input type="text" id="lc-lat" placeholder="-7.8659..." oninput="saveSets()"></div>
+            <div class="coord-box"><span class="coord-lbl">Lng Manual</span><input type="text" id="lc-lng" placeholder="111.4649..." oninput="saveSets()"></div>
+          </div>
+          <button class="btn-reset" onclick="resetLoc()">
+            <i class="fas fa-rotate-left"></i> Reset Semua Field Lokasi
+          </button>
+        </div>
+      </div>
+
+      <!-- Panduan Penggunaan -->
+      <div class="set-sec">
+        <div class="set-sec-ttl">Panduan</div>
+        <div class="coll-hdr" id="guide-hdr" onclick="togColl('guide')">
+          <div class="coll-ttl"><i class="fas fa-book-open"></i> Panduan Penggunaan</div>
+          <i class="fas fa-chevron-down coll-arr"></i>
+        </div>
+        <div class="coll-body" id="guide-body">
+          <div class="guide-wrap">
+
+            <div class="guide-step">
+              <div class="guide-num">1</div>
+              <div class="guide-content">
+                <div class="guide-title">Isi Teks Laporan</div>
+                <div class="guide-desc">Salin &amp; tempel teks laporan dari WhatsApp. Wajib memuat: <b>Patroli</b>, <b>Hari</b>, <b>Tanggal</b>, <b>Identitas Pelanggaran</b>, <b>Personil</b>, dan <b>Danru</b>.</div>
+              </div>
+            </div>
+
+            <div class="guide-step">
+              <div class="guide-num">2</div>
+              <div class="guide-content">
+                <div class="guide-title">Foto via <span class="chip y">📷 Kamera</span></div>
+                <div class="guide-desc">Pastikan GPS aktif. Sistem otomatis membaca EXIF → geocode nama jalan → watermark memuat <b>nama jalan, waktu, koordinat, dan QR Code</b> ke Google Maps.</div>
+              </div>
+            </div>
+
+            <div class="guide-step">
+              <div class="guide-num">3</div>
+              <div class="guide-content">
+                <div class="guide-title">Foto via <span class="chip b">🖼 Galeri</span></div>
+                <div class="guide-desc">Tidak membaca EXIF GPS. Watermark menggunakan <b>lokasi manual</b> dari form pengaturan. Isi lokasi manual terlebih dahulu agar watermark akurat.</div>
+              </div>
+            </div>
+
+            <div class="guide-step">
+              <div class="guide-num">4</div>
+              <div class="guide-content">
+                <div class="guide-title">Kompresi Otomatis</div>
+                <div class="guide-desc">Foto <b>&gt; 1 MB</b> dikompres otomatis ke ≤ 1 MB. Badge <span class="chip b">↓1MB</span> muncul di thumbnail bila dikompres.</div>
+              </div>
+            </div>
+
+            <div class="guide-step">
+              <div class="guide-num">5</div>
+              <div class="guide-content">
+                <div class="guide-title">Aksi di Thumbnail &amp; Preview</div>
+                <div class="guide-desc">
+                  Tap <span class="chip g"><i class="fas fa-map-location-dot"></i> peta</span> untuk melihat lokasi EXIF.<br>
+                  Tap <span class="chip b"><i class="fas fa-download"></i></span> di thumbnail untuk unduh foto ke HP.<br>
+                  Tap foto untuk buka preview penuh — tombol <span class="chip b"><i class="fas fa-download"></i> unduh</span> dan peta ada di panel bawah.
+                </div>
+              </div>
+            </div>
+
+            <!-- Langkah baru: Simpan Draft -->
+            <div class="guide-step">
+              <div class="guide-num">6</div>
+              <div class="guide-content">
+                <div class="guide-title"><span class="chip p"><i class="fas fa-save"></i> Simpan Draft</span></div>
+                <div class="guide-desc">
+                  Tekan <b>Simpan Draft</b> untuk menyimpan foto kamera sementara.<br>
+                  Foto otomatis <b>diunduh ke HP</b> + disimpan ke <b>Google Drive sementara</b>.<br>
+                  Draft tetap ada sampai laporan dikirim atau dihapus manual.
+                </div>
+              </div>
+            </div>
+
+            <!-- Langkah baru: Load Draft -->
+            <div class="guide-step">
+              <div class="guide-num">7</div>
+              <div class="guide-content">
+                <div class="guide-title"><span class="chip p"><i class="fas fa-cloud-download-alt"></i> Load Draft</span></div>
+                <div class="guide-desc">
+                  Tekan <b>Load Draft</b> untuk memuat ulang foto dari sesi sebelumnya.<br>
+                  Pilih draft yang tersimpan → foto &amp; teks laporan dipulihkan otomatis.<br>
+                  Setelah laporan dikirim, draft di server <b>terhapus otomatis</b>.
+                </div>
+              </div>
+            </div>
+
+            <div class="guide-step">
+              <div class="guide-num">8</div>
+              <div class="guide-content">
+                <div class="guide-title">Kirim Laporan</div>
+                <div class="guide-desc">Tekan <b>KIRIM LAPORAN</b>. Foto diupload ke <b>Google Drive</b> dan data tersimpan ke <b>Spreadsheet</b>. Pastikan koneksi internet stabil.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Tentang Aplikasi -->
+      <div class="set-sec">
+        <div class="set-sec-ttl">Tentang Aplikasi</div>
+        <div class="coll-hdr" id="about-hdr" onclick="togColl('about')">
+          <div class="coll-ttl"><i class="fas fa-circle-info"></i> Info Aplikasi</div>
+          <i class="fas fa-chevron-down coll-arr"></i>
+        </div>
+        <div class="coll-body" id="about-body">
+          <div class="app-info">
+            <div class="ai-row"><span class="k">Aplikasi</span><span class="v">SI-PEDAS Mobile</span></div>
+            <div class="ai-row"><span class="k">Versi</span><span class="v">4.0.0</span></div>
+            <div class="ai-row"><span class="k">Satuan</span><span class="v">Satlinmas Pedestrian</span></div>
+            <div class="ai-row"><span class="k">Wilayah</span><span class="v">Ponorogo, Jawa Timur</span></div>
+            <div class="ai-row"><span class="k">Author</span><span class="v" style="font-size:.72rem">Ahmad Abdul Basith, S.Tr.I.P</span></div>
+            <div class="ai-row">
+              <span class="k">Kontak Aduan</span>
+              <a href="https://wa.me/6285159686554" target="_blank" class="wa-btn">
+                <i class="fab fa-whatsapp"></i> 085159686554
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /set-body -->
+  </div><!-- /set-sheet -->
+</div><!-- /#set-ov -->
+
+<!-- ═══ ELEMEN TERSEMBUNYI ══════════════════════════════════ -->
+<input type="file" id="fg" accept="image/*" multiple>
+<input type="file" id="fc" accept="image/*" capture="environment">
+<canvas id="cvs"></canvas>
+<div id="qr-worker"></div>
+<img id="img-linmas"
+     src="assets/icon-full.png"
+     crossorigin="anonymous" alt="">
+
+<!-- ═══ MAIN UI ══════════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="header">
+    <div class="hdr-bar">
+      <span class="app-ver">SI-PEDAS v1.0</span>
+      <button class="gear-btn" id="gear-btn" onclick="openSet()">
+        <i class="fas fa-gear"></i>
+        <span class="gear-dot" id="gear-dot"></span>
+      </button>
+    </div>
+    <div class="logos-row">
+      <div class="logo-wrap">
+        <img src="assets/sipedas.png" alt="LINMAS">
+      </div>
+      <div class="sipedas-wrap">
+        <div class="sipedas-title">SI-PEDAS</div>
+        <div class="sipedas-badge"><i class="fas fa-mobile-screen-button"></i> Mobile</div>
+      </div>
+    </div>
+    <p class="hdr-sub">Sistem Informasi Pedestrian Satlinmas</p>
+    <div class="hdr-div"></div>
+  </div>
+
+  <div class="form-area">
+
+    <!-- ── Kartu Laporan Teks ── -->
+    <div class="card">
+      <div class="card-head">
+        <div class="ci ci-blue"><i class="fas fa-file-lines"></i></div>
+        <h3>Isi Laporan</h3>
+        <span class="badge-req">Wajib</span>
+      </div>
+      <div class="card-body">
+        <textarea id="laporan" class="lap-input"
+          placeholder="Tempel teks laporan Patroli Pedestrian dari WhatsApp"
+          oninput="updateChar()"></textarea>
+        <div class="char-row"><span class="char-cnt" id="char-cnt">0 karakter</span></div>
+      </div>
+    </div>
+
+    <!-- ── Kartu Dokumentasi Foto ── -->
+    <div class="card">
+      <div class="card-head">
+        <div class="ci ci-gold"><i class="fas fa-camera"></i></div>
+        <h3>Dokumentasi Foto</h3>
+        <span class="badge-cnt" id="foto-cnt-hd">0 / 10</span>
+      </div>
+      <div class="card-body">
+
+        <!-- Tombol pilih foto -->
+        <div class="upload-zone">
+          <button class="up-btn gal" onclick="document.getElementById('fg').click()">
+            <i class="fas fa-images"></i>
+            <span class="up-main">Galeri</span>
+            <span class="up-note">Kompres + WM Manual</span>
+          </button>
+          <button class="up-btn cam" onclick="document.getElementById('fc').click()">
+            <i class="fas fa-camera"></i>
+            <span class="up-main">Kamera</span>
+            <span class="up-note">EXIF + QR + WM Jalan</span>
+          </button>
+        </div>
+
+        <!-- Info bar -->
+        <div class="info-bar">
+          <i class="fas fa-circle-info"></i>
+          <span>Kamera: EXIF GPS + QR · Galeri: Kompres + Watermark · &gt;1MB dikompres · Kamera: bisa disimpan Draft</span>
+        </div>
+
+        <!-- Counter & grid foto -->
+        <div class="foto-ctr" id="foto-ctr">Belum ada foto — <b>Wajib</b> minimal 1 foto</div>
+        <div class="foto-grid" id="foto-grid">
+          <div class="empty-foto"><i class="fas fa-photo-film"></i>Foto yang dipilih muncul di sini</div>
+        </div>
+
+        <!-- ─── DRAFT ACTION ROW ───────────────────────
+             Dua tombol: Simpan Draft + Load Draft
+             Badge indikator muncul jika ada draft aktif
+        ─────────────────────────────────────────────────── -->
+        <div class="draft-action-row">
+          <button class="btn-draft-save" id="btn-save-draft" onclick="saveDraft()">
+            <i class="fas fa-save"></i> Simpan Draft
+          </button>
+          <button class="btn-draft-load" onclick="loadDraftList()">
+            <i class="fas fa-cloud-download-alt"></i> Load Draft
+          </button>
+          <span id="draft-active-badge">
+            <i class="fas fa-circle" style="font-size:.45rem"></i> Draft Aktif
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /form-area -->
+
+  <!-- ── Tombol Kirim ── -->
+  <div class="submit-wrap">
+    <button class="sub-btn" id="sub-btn" onclick="submitData()">
+      <i class="fas fa-paper-plane"></i> KIRIM LAPORAN
+    </button>
+  </div>
+
+</div><!-- /wrap -->
+
+<script src="js/api.js"></script>
+<script src="js/mobile.js"></script>
+
+</body>
+</html>
