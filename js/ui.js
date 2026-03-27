@@ -231,6 +231,7 @@ function getDanru(){
   // 🔥 kapital otomatis
   return nama.trim().replace(/\b\w/g,function(c){return c.toUpperCase();});
 }
+
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function downloadFoto(idx) {
