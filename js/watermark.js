@@ -9,6 +9,23 @@ function wrapTxt(ctx,txt,maxW){
   words.forEach(function(w){var t=cur?cur+' '+w:w;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else cur=t;});
   if(cur)lines.push(cur);return lines.slice(0,5);
 }
+function getDanru(){
+  var teks = (S.danru || '').trim();
+  if (!teks) return '';
+  var nama = '';
+  // 1. Danru 2 (Basith)
+  var m1 = /Danru\s*\d+\s*\(\s*(.*?)\s*\)/i.exec(teks);
+  if (m1) nama = m1[1];
+  // 2. Danru Basith / Danru 2 Basith
+  if (!nama) {
+    var m2 = /Danru\s+(?:\d+\s*)?([A-Za-z\s\.]+)/i.exec(teks);
+    if (m2) nama = m2[1];
+  }
+  // 3. fallback (kalau cuma nama saja)
+  if (!nama) nama = teks;
+  return nama.trim().replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+}
+
 function drawWM(ctx,w,h,idx,qrCvs){
   var f=fotos[idx],isCam=(f.source==='camera'),exif=f.exif;
   var lat=null,lng=null;
