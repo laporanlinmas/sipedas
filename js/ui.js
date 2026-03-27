@@ -214,7 +214,23 @@ document.getElementById('map-modal').addEventListener('click',function(e){if(e.t
 function pad(n){return n<10?'0'+n:''+n;}
 function nowFull(){var n=new Date();return pad(n.getDate())+'/'+pad(n.getMonth()+1)+'/'+n.getFullYear()+' '+pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());}
 function b64sz(d){return Math.ceil(((d.split(',')[1]||'').length)*3/4);}
-function getDanru(){var t=document.getElementById('laporan').value.replace(/[\*\_\~]/g,'');var m=/Danru\s*\d+\s*\(\s*(.*?)\s*\)/i.exec(t);return m?m[1].trim():'';}
+function getDanru(){
+  var t=document.getElementById('laporan').value.replace(/[\*\_\~]/g,'').trim();
+  if(!t) return '';
+  var nama='';
+  // 1. Danru 2 (Basith)
+  var m1=/Danru\s*\d+\s*\(\s*(.*?)\s*\)/i.exec(t);
+  if(m1) nama=m1[1];
+  // 2. Danru Basith / Danru 2 Basith
+  if(!nama){
+    var m2=/Danru\s+(?:\d+\s*)?([A-Za-z\s\.]+)/i.exec(t);
+    if(m2) nama=m2[1];
+  }
+  // 3. fallback (kalau cuma nama)
+  if(!nama) nama=t;
+  // 🔥 kapital otomatis
+  return nama.trim().replace(/\b\w/g,function(c){return c.toUpperCase();});
+}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function downloadFoto(idx) {
