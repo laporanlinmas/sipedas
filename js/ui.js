@@ -226,9 +226,7 @@ function getDanru(){
     var m2=/Danru\s+(?:\d+\s*)?([A-Za-z\s\.]+)/i.exec(t);
     if(m2) nama=m2[1];
   }
-  // 3. fallback (kalau cuma nama)
-  if(!nama) nama=t;
-  // 🔥 kapital otomatis
+  // kapital otomatis
   return nama.trim().replace(/\b\w/g,function(c){return c.toUpperCase();});
 }
 
