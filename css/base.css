@@ -1,0 +1,34 @@
+:root{
+  --navy:#060d1a;--navy2:#0b1628;--navy3:#0f1e35;
+  --card:#111f38;--card2:#162844;
+  --blue:#1a65d6;--blueb:#2979f5;
+  --bdim:rgba(26,101,214,.22);--bpal:rgba(26,101,214,.10);
+  --gold:#f0b429;--gdim:rgba(240,180,41,.16);--gpal:rgba(240,180,41,.08);
+  --green:#10b981;--grdim:rgba(16,185,129,.16);
+  --red:#ef4444;--rdim:rgba(239,68,68,.16);
+  --amber:#f59e0b;--adim:rgba(245,158,11,.14);
+  --purple:#7c3aed;--pdim:rgba(124,58,237,.18);--ppal:rgba(124,58,237,.10);
+  --text:#eef2ff;--mid:#94a3c4;--muted:#4a6280;
+  --bdr:rgba(255,255,255,.06);--bdr2:rgba(255,255,255,.10);
+  --rx:22px;--rl:16px;--rm:12px;--rs:8px;
+  --f:'Space Grotesk',sans-serif;--m:'JetBrains Mono',monospace;
+  --sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--f);background:var(--navy);color:var(--text);min-height:100dvh;width:100%;overflow-x:hidden;-webkit-font-smoothing:antialiased;touch-action:pan-y;}
+
+/* ═══════════════════════════════════════════════════════
+   BACKGROUND DECORATIONS
+═══════════════════════════════════════════════════════ */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:24px 24px;}
+.bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 45% at 50% -5%,rgba(26,101,214,.20) 0%,transparent 65%),radial-gradient(ellipse 40% 30% at 90% 90%,rgba(240,180,41,.07) 0%,transparent 60%);}
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT WRAPPER
+═══════════════════════════════════════════════════════ */
+.wrap{position:relative;z-index:1;min-height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(28px + var(--sb));max-width:480px;margin:0 auto;width:100%;}

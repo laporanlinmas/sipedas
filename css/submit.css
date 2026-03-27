@@ -1,0 +1,8 @@
+/* ═══════════════════════════════════════════════════════
+   SUBMIT BUTTON
+═══════════════════════════════════════════════════════ */
+.submit-wrap{padding:14px 16px 0;}
+.sub-btn{width:100%;padding:17px;border-radius:var(--rx);border:none;cursor:pointer;background:linear-gradient(135deg,var(--blueb) 0%,#1450b8 100%);color:#fff;font-family:var(--f);font-size:.98rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 28px rgba(41,121,245,.38),0 1px 0 rgba(255,255,255,.1) inset;transition:transform .18s,box-shadow .18s;-webkit-appearance:none;}
+.sub-btn:active{transform:scale(.97);box-shadow:0 2px 10px rgba(41,121,245,.25);}
+.sub-btn:disabled{background:rgba(255,255,255,.07);color:var(--muted);box-shadow:none;cursor:not-allowed;transform:none;}
+.sub-btn i{font-size:1rem;}
