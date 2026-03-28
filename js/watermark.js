@@ -22,14 +22,14 @@ function drawWM(ctx,w,h,idx,qrCvs){
   var BAR=Math.max(3,Math.round(w*0.006)),PAD=Math.round(w*0.022),PADV=8;
   var LOGO=Math.round(Math.min(w,h)*0.10),QR=qrCvs?Math.max(90,Math.min(240,Math.round(Math.min(w,h)*0.16))):0;
   var QR_PAD=qrCvs?Math.round(PAD*0.6):0;
-  var fT=Math.max(11,Math.round(LOGO*0.36)),fB=Math.max(9,Math.round(LOGO*0.30)),fS=Math.max(7,Math.round(fB*0.82));
+  var fT=Math.max(11,Math.round(LOGO*0.35)),fB=Math.max(9,Math.round(LOGO*0.30)),fS=Math.max(7,Math.round(fB*0.70));
   var LH=Math.round(fB*1.5),TX=BAR+Math.round(PAD*0.35)+LOGO+Math.round(PAD*0.45);
   var TW=w-TX-PAD-(qrCvs?QR+QR_PAD*2:0);
   ctx.font=fB+'px Arial,sans-serif';
   var addrLines=wrapTxt(ctx,addrFull,TW);
   var nLines=1+1+1+addrLines.length+1;
   var CONTH=PADV+Math.round(fT*1.45)+nLines*LH+PADV;
-  var STRPH=Math.max(Math.round(h*0.15),CONTH,qrCvs?QR+PADV*2:0);
+  var STRPH=Math.max(Math.round(h*0.10),CONTH*0.8,qrCvs?QR+PADV*2:0);
   var SY=h-STRPH;
   ctx.save();
   var gr=ctx.createLinearGradient(0,SY,0,h);gr.addColorStop(0,'rgba(2,6,18,0.42)');gr.addColorStop(0.6,'rgba(2,6,18,0.65)');gr.addColorStop(1,'rgba(2,6,18,0.80)');ctx.fillStyle=gr;ctx.fillRect(0,SY,w,STRPH);
