@@ -20,7 +20,7 @@ function drawWM(ctx,w,h,idx,qrCvs){
   var timeStr=isCam?fmtExifTime(exif):(nowFull()+' WIB');
   var danru=getDanru()||'—';
   var BAR=Math.max(3,Math.round(w*0.006)),PAD=Math.round(w*0.022),PADV=8;
-  var LOGO=Math.round(Math.min(w,h)*0.10),QR=qrCvs?Math.max(90,Math.min(240,Math.round(Math.min(w,h)*0.16))):0;
+  var LOGO=Math.round(Math.min(w,h)*0.10),QR=qrCvs?Math.max(75,Math.min(200,Math.round(Math.min(w,h)*0.14))):0;
   var QR_PAD=qrCvs?Math.round(PAD*0.6):0;
   var fT=Math.max(11,Math.round(LOGO*0.35)),fB=Math.max(9,Math.round(LOGO*0.30)),fS=Math.max(7,Math.round(fB*0.70));
   var LH=Math.round(fB*1.5),TX=BAR+Math.round(PAD*0.35)+LOGO+Math.round(PAD*0.45);
@@ -41,7 +41,7 @@ function drawWM(ctx,w,h,idx,qrCvs){
     var qx=w-QR-QR_PAD,qy=SY+Math.round((STRPH-QR)/2) - 25;
     ctx.fillStyle='#ffffff';var qPad=4;ctx.fillRect(qx-qPad,qy-qPad,QR+qPad*2,QR+qPad*2);
     try{ctx.drawImage(qrCvs,qx,qy,QR,QR);}catch(e){}
-    ctx.font='bold '+Math.max(7,Math.round(fS*0.82))+'px Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,0.70)';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('📍 SCAN',qx+QR/2,qy+QR+4);
+    ctx.font='bold '+Math.max(7,Math.round(fS*0.75))+'px Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,0.70)';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('LIHAT LOKASI',qx+QR/2,qy+QR+4);
   }
   ctx.textAlign='left';ctx.textBaseline='top';var tx=TX,ty=SY+PADV;
   ctx.font='800 '+fT+'px Arial,sans-serif';ctx.fillStyle='rgba(255,210,0,0.90)';ctx.fillText('SATLINMAS PEDESTRIAN',tx,ty,TW);ty+=Math.round(fT*1.45);
