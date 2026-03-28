@@ -41,7 +41,7 @@ function drawWM(ctx,w,h,idx,qrCvs){
     var qx=w-QR-QR_PAD,qy=SY+Math.round((STRPH-QR)/2) - 25;
     ctx.fillStyle='#ffffff';var qPad=4;ctx.fillRect(qx-qPad,qy-qPad,QR+qPad*2,QR+qPad*2);
     try{ctx.drawImage(qrCvs,qx,qy,QR,QR);}catch(e){}
-    ctx.font='bold '+Math.max(7,Math.round(fS*0.75))+'px Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,0.70)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('LIHAT LOKASI',qx+QR/2,qy+QR-5);
+    ctx.font='bold '+Math.max(7,Math.round(fS*0.65))+'px Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,0.70)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('LIHAT LOKASI',qx+QR/2,qy-5);
   }
   ctx.textAlign='left';ctx.textBaseline='top';var tx=TX,ty=SY+PADV;
   ctx.font='800 '+fT+'px Arial,sans-serif';ctx.fillStyle='rgba(255,210,0,0.90)';ctx.fillText('SATLINMAS PEDESTRIAN',tx,ty,TW);ty+=Math.round(fT*1.45);
