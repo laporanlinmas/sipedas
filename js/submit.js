@@ -77,31 +77,48 @@ function submitData() {
       return;
     }
 
-    // Upload satu foto
+    // Upload satu foto dengan retry logic
     var f   = fotos[uploadIdx];
     var pct = 10 + Math.round((uploadIdx / totalFoto) * 70);
     stepProg(1, pct, 'Upload foto ' + (uploadIdx + 1) + ' / ' + totalFoto + '...');
 
-    apiPost('uploadFoto', {
-      data: {
-        foto       : { data: f.data, mime: f.mime, source: f.source },
-        meta       : exifMetas[uploadIdx] || null,
-        laporan    : lap,
-        noFoto     : uploadIdx + 1,
-        jumlahTotal: totalFoto
-      }
-    })
-    .then(function(res) {
-      if (!res.success) throw new Error('Foto ' + (uploadIdx + 1) + ' gagal: ' + (res.message || 'Error'));
-      linkFoto.push({ link: res.linkFile, namaFile: res.namaFile, source: f.source, meta: exifMetas[uploadIdx] || null });
-      if (!folderUrl && res.folderUrl) folderUrl = res.folderUrl;
-      uploadIdx++;
-      uploadNext();
-    })
-    .catch(function(err) {
-      hideLoading(); btn.disabled = false;
-      showAlert('error', 'Gagal Upload Foto ' + (uploadIdx + 1), err.message || 'Periksa koneksi dan coba lagi.');
-    });
+    function uploadPhotoWithRetry(retryAttempt) {
+      retryAttempt = retryAttempt || 0;
+      
+      apiPost('uploadFoto', {
+        data: {
+          foto       : { data: f.data, mime: f.mime, source: f.source },
+          meta       : exifMetas[uploadIdx] || null,
+          laporan    : lap,
+          noFoto     : uploadIdx + 1,
+          jumlahTotal: totalFoto
+        }
+      })
+      .then(function(res) {
+        if (!res.success) throw new Error('Foto ' + (uploadIdx + 1) + ' gagal: ' + (res.message || 'Error'));
+        linkFoto.push({ link: res.linkFile, namaFile: res.namaFile, source: f.source, meta: exifMetas[uploadIdx] || null });
+        if (!folderUrl && res.folderUrl) folderUrl = res.folderUrl;
+        uploadIdx++;
+        uploadNext();
+      })
+      .catch(function(err) {
+        // Retry hingga 2x jika gagal
+        if (retryAttempt < 2) {
+          var delayMs = 1000 * Math.pow(2, retryAttempt);  // 1s, 2s exponential backoff
+          console.log('Retry foto ' + (uploadIdx + 1) + ' attempt ' + (retryAttempt + 1) + ' setelah ' + delayMs + 'ms');
+          stepProg(1, pct, 'Retry upload foto ' + (uploadIdx + 1) + ' (' + (retryAttempt + 1) + '/2)...');
+          setTimeout(function() {
+            uploadPhotoWithRetry(retryAttempt + 1);
+          }, delayMs);
+        } else {
+          // Sudah retry 2x, gagal total
+          hideLoading(); btn.disabled = false;
+          showAlert('error', 'Gagal Upload Foto ' + (uploadIdx + 1), err.message || 'Periksa koneksi dan coba lagi.');
+        }
+      });
+    }
+
+    uploadPhotoWithRetry(0);
   }
 
   setTimeout(uploadNext, 300);
