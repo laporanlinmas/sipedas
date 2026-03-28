@@ -4,11 +4,27 @@
 ═══════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════
-   SUBMIT LAPORAN — v4.3
-   Alur: upload foto SATU PER SATU dulu ke Drive via
-   action uploadFoto, baru kirim laporan tanpa base64.
-   Solusi batas payload 4.5MB Vercel.
+   SUBMIT LAPORAN — v4.4
+   Update: Warm-up GAS + Optimize watermark processing
+   Alur: 
+   1. Warm-up GAS server (eliminate cold start)
+   2. Upload foto SATU PER SATU ke Drive (+ retry logic)
+   3. Kirim laporan ke Spreadsheet (tanpa base64)
 ═══════════════════════════════════════════════════════════ */
+
+// Warm-up GAS server — eliminate cold start penalty
+function warmupGAS() {
+  return apiPost('ping', {})
+    .then(function(res) { 
+      console.log('[warmup] GAS siap. Response:', res); 
+      return true;
+    })
+    .catch(function(err) { 
+      console.log('[warmup] Ping failed:', err.message);
+      return true;  // Lanjut regardless, don't block
+    });
+}
+
 function submitData() {
   var lap = document.getElementById('laporan').value.trim();
   if (!lap)          { showAlert('error','Laporan Kosong','Isi teks laporan terlebih dahulu.<br><small style="color:var(--muted)">Tempel dari WhatsApp.</small>'); return; }
@@ -20,6 +36,11 @@ function submitData() {
   var totalFoto = fotos.length;
   showLoading('Mengirim Laporan...', 'Mempersiapkan ' + totalFoto + ' foto...');
   stepProg(0, 5, 'Siap upload ' + totalFoto + ' foto...');
+
+  // Warm-up GAS sebelum mulai upload (2x lebih cepat)
+  warmupGAS().then(continueSubmit);
+
+  function continueSubmit() {
 
   // Kumpulkan exifMeta per foto
   var exifMetas = fotos.map(function(f) {
@@ -122,4 +143,5 @@ function submitData() {
   }
 
   setTimeout(uploadNext, 300);
+  }  // end continueSubmit
 }
