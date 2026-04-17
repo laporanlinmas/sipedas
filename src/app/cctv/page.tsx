@@ -66,38 +66,49 @@ function CameraCell({
   onClick: () => void;
   showOverlay: boolean;
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(true);
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  // Set loading false setelah gambar pertama berhasil
-  const [firstLoaded, setFirstLoaded] = useState(false);
-
-  const refreshMs = 333; // ~3 FPS
+  const imgRef  = useRef<HTMLImageElement>(null);
+  const loadingRef = useRef(true); // useRef to avoid stale closure
 
   useEffect(() => {
-    setErr(false);
+    // Reset state on every channel change
+    loadingRef.current = true;
     setLoading(true);
-    setFirstLoaded(false);
+    setErr(false);
 
-    if (!ch.url || !ch.active) return;
-
-    // Langsung set src gambar pertama
-    if (imgRef.current) {
-      imgRef.current.src = `${ch.url}&t=${Date.now()}`;
+    if (!ch.url || !ch.active) {
+      setLoading(false);
+      return;
     }
 
-    // Interval: update src langsung via ref tanpa React re-render
-    const iv = setInterval(() => {
+    const setUrl = () => {
       if (imgRef.current) {
-        imgRef.current.src = `${ch.url}&t=${Date.now()}`;
+        const sep = ch.url.includes('?') ? '&' : '?';
+        imgRef.current.src = `${ch.url}${sep}_t=${Date.now()}`;
       }
-    }, refreshMs);
+    };
 
+    // Set first frame immediately
+    setUrl();
+
+    // Then repeat at 3 FPS
+    const iv = setInterval(setUrl, 333);
     return () => clearInterval(iv);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ch.url, ch.active]);
+
+  const handleLoad = () => {
+    if (loadingRef.current) {
+      loadingRef.current = false;
+      setLoading(false);
+    }
+  };
+
+  const handleError = () => {
+    loadingRef.current = false;
+    setLoading(false);
+    setErr(true);
+  };
 
   const renderStream = () => {
     if (!ch.url || !ch.active) {
@@ -115,27 +126,29 @@ function CameraCell({
         <div className="cctv-error">
           <i className="fas fa-exclamation-triangle" />
           <span>Gagal memuat stream</span>
-          <button onClick={(e) => { e.stopPropagation(); setErr(false); setLoading(true); setImgKey(Date.now()); }}>
+          <button onClick={(e) => {
+            e.stopPropagation();
+            loadingRef.current = true;
+            setErr(false);
+            setLoading(true);
+            if (imgRef.current) {
+              const sep = ch.url.includes('?') ? '&' : '?';
+              imgRef.current.src = `${ch.url}${sep}_t=${Date.now()}`;
+            }
+          }}>
             <i className="fas fa-redo" /> Retry
           </button>
         </div>
       );
     }
 
-    // Direct Snapshot Refresh (~3 FPS)
-    // PENTING: TIDAK pakai key={imgKey} agar img tidak di-unmount tiap tick
     return (
       <img
         ref={imgRef}
         alt={ch.name}
         style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000', display: 'block' }}
-        onLoad={() => {
-          if (!firstLoaded) {
-            setFirstLoaded(true);
-            setLoading(false);
-          }
-        }}
-        onError={() => { setLoading(false); setErr(true); }}
+        onLoad={handleLoad}
+        onError={handleError}
       />
     );
   };
@@ -347,6 +360,7 @@ export default function CCTVPage() {
       <div className="cctv-grid cctv-grid-1">
         <div className="cctv-cell-wrap">
           <CameraCell
+            key={activeChannelId}  {/* KRITIS: force remount saat channel berganti */}
             ch={activeChannel}
             isFocused={true}
             onClick={() => { }}
@@ -367,13 +381,22 @@ export default function CCTVPage() {
         </div>
       </div>
 
-      {/* MULTI-CHANNEL SELECTOR BAR */}
-      <div className="cctv-ch-bar" style={{ padding: '12px 10px', justifyContent: 'center' }}>
+      {/* MULTI-CHANNEL SELECTOR BAR — horizontal scroll untuk mobile */}
+      <div className="cctv-ch-bar" style={{
+        padding: '10px 8px',
+        overflowX: 'auto',
+        flexWrap: 'nowrap',
+        justifyContent: 'flex-start',
+        WebkitOverflowScrolling: 'touch',
+        scrollbarWidth: 'none',
+        gap: '6px',
+      }}>
         {channels.map(ch => (
           <button
             key={ch.id}
             className={`cctv-ch-btn${activeChannelId === ch.id ? ' active' : ''}${ch.active && ch.url ? ' live' : ''}`}
             onClick={() => setActiveChannelId(ch.id)}
+            style={{ flexShrink: 0 }}
           >
             {ch.active && ch.url && <span className="cctv-live-dot-sm" />}
             CH {ch.id}
