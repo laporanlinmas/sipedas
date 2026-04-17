@@ -12,13 +12,13 @@ import Link from 'next/link';
 const DEFAULT_CHANNELS: Channel[] = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   name: `Kamera ${i + 1}`,
-  url: `/api/cctv-proxy?ch=${i + 1}&type=stream`,
-  type: 'mjpeg' as StreamType,
+  url: `http://publik:publik123@103.109.206.38:80/cgi-bin/snapshot.cgi?channel=${i + 1}`,
+  type: 'snapshot' as StreamType,
   location: `Lokasi ${i + 1}`,
   active: true,
 }));
 
-type StreamType = 'mjpeg';
+type StreamType = 'snapshot';
 
 interface Channel {
   id: number;
@@ -29,7 +29,7 @@ interface Channel {
   active: boolean;
 }
 
-const STORAGE_KEY = 'sipedas_cctv_channels_v7';
+const STORAGE_KEY = 'sipedas_cctv_channels_v8';
 
 function loadChannels(): Channel[] {
   try {
@@ -71,9 +71,18 @@ function CameraCell({
   const [loading, setLoading] = useState(true);
   const [imgKey, setImgKey] = useState(Date.now());
 
+  const refreshMs = 333; // ~3 FPS
+
   useEffect(() => {
     setErr(false);
     setLoading(true);
+    
+    // Interval untuk refresh gambar 3 FPS
+    const iv = setInterval(() => {
+      setImgKey(Date.now());
+    }, refreshMs);
+    
+    return () => clearInterval(iv);
   }, [ch.url, ch.type]);
 
   const renderStream = () => {
@@ -99,15 +108,16 @@ function CameraCell({
       );
     }
 
-    // Dahua MJPEG Stream (Continuous Video)
+    // Direct Snapshot Refresh (~3 FPS)
+    const snapUrl = ch.url.includes('?') ? `${ch.url}&t=${imgKey}` : `${ch.url}?t=${imgKey}`;
     return (
       <img
         key={imgKey}
-        src={`${ch.url}&_t=${imgKey}`}
+        src={snapUrl}
         alt={ch.name}
         style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000', display: 'block' }}
         onLoad={() => setLoading(false)}
-        onError={() => setErr(true)}
+        onError={() => { setLoading(false); setErr(true); }}
       />
     );
   };
@@ -182,11 +192,11 @@ function ChannelSettings({
           <div className="cctv-field">
             <label>Tipe Stream</label>
             <div style={{ padding: '10px', background: 'rgba(41, 121, 245, 0.1)', border: '1px solid var(--blue)', borderRadius: '8px', color: '#e2e8f0', fontSize: '0.85rem' }}>
-              <strong><i className="fas fa-video"></i> Dahua Video Stream (Sub-stream)</strong>
-              <div style={{ color: 'var(--green)', marginTop: '4px', fontSize: '0.75rem' }}>✓ Mode Video Berkelanjutan Aktif</div>
+              <strong><i className="fas fa-camera"></i> Snapshot Beruntun (3 FPS)</strong>
+              <div style={{ color: 'var(--green)', marginTop: '4px', fontSize: '0.75rem' }}>✓ Mode Cepat Responsif</div>
             </div>
             <div className="cctv-field-hint" style={{ marginTop: '8px' }}>
-              Sistem akan membaca aliran video (stream MJPEG) secara langsung dari DVR sehingga bergerak terus tanpa memukul server (Anti Lockout).
+              Mengambil gambar statis langsung dari DVR setiap 333ms.
             </div>
           </div>
           <div className="cctv-field-toggle">
