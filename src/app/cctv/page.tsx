@@ -359,8 +359,9 @@ export default function CCTVPage() {
       {/* SINGLE CHANNEL VIEWER */}
       <div className="cctv-grid cctv-grid-1">
         <div className="cctv-cell-wrap">
+          {/* key=activeChannelId: force remount saat channel berganti agar gambar ikut berganti */}
           <CameraCell
-            key={activeChannelId}  {/* KRITIS: force remount saat channel berganti */}
+            key={activeChannelId}
             ch={activeChannel}
             isFocused={true}
             onClick={() => { }}
