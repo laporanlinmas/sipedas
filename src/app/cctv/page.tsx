@@ -12,7 +12,7 @@ import Link from 'next/link';
 const DEFAULT_CHANNELS: Channel[] = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   name: `Kamera ${i + 1}`,
-  url: `http://publik:publik123@103.109.206.38:80/cgi-bin/snapshot.cgi?channel=${i + 1}`,
+  url: `/api/cctv-proxy?ch=${i + 1}`,
   type: 'snapshot' as StreamType,
   location: `Lokasi ${i + 1}`,
   active: true,
@@ -29,7 +29,7 @@ interface Channel {
   active: boolean;
 }
 
-const STORAGE_KEY = 'sipedas_cctv_channels_v10';
+const STORAGE_KEY = 'sipedas_cctv_channels_v11';
 
 function loadChannels(): Channel[] {
   try {
@@ -76,12 +76,12 @@ function CameraCell({
   useEffect(() => {
     setErr(false);
     setLoading(true);
-    
+
     // Interval untuk refresh gambar 3 FPS
     const iv = setInterval(() => {
       setImgKey(Date.now());
     }, refreshMs);
-    
+
     return () => clearInterval(iv);
   }, [ch.url, ch.type]);
 
