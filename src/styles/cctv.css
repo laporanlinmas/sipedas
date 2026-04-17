@@ -532,6 +532,8 @@
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
 }
 
 .cctv-ch-bar::-webkit-scrollbar { display: none; }
@@ -552,6 +554,18 @@
   white-space: nowrap;
   transition: all 0.18s;
   flex-shrink: 0;
+}
+
+/* Mobile: tombol lebih kecil & compact */
+@media (max-width: 600px) {
+  .cctv-ch-btn {
+    padding: 4px 8px;
+    font-size: 0.62rem;
+    border-radius: 8px;
+  }
+  .cctv-grid-1 {
+    grid-auto-rows: calc(100dvh - 200px) !important;
+  }
 }
 
 .cctv-ch-btn.active {
