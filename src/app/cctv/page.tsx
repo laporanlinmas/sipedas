@@ -12,13 +12,13 @@ import Link from 'next/link';
 const DEFAULT_CHANNELS: Channel[] = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   name: `Kamera ${i + 1}`,
-  url: `/api/cctv-proxy?ch=${i + 1}&type=snapshot`,
-  type: 'snapshot-fast' as StreamType,
+  url: `/api/cctv-proxy?ch=${i + 1}&type=stream`,
+  type: 'mjpeg' as StreamType,
   location: `Lokasi ${i + 1}`,
   active: true,
 }));
 
-type StreamType = 'snapshot-fast' | 'hls' | 'dahua-proxy';
+type StreamType = 'mjpeg';
 
 interface Channel {
   id: number;
@@ -29,7 +29,7 @@ interface Channel {
   active: boolean;
 }
 
-const STORAGE_KEY = 'sipedas_cctv_channels_v5';
+const STORAGE_KEY = 'sipedas_cctv_channels_v7';
 
 function loadChannels(): Channel[] {
   try {
@@ -53,15 +53,6 @@ function saveChannels(channels: Channel[]) {
 }
 
 // ───────────────────────────────────────────────────────────
-//  Helpers: menentukan cara render stream berdasarkan URL
-// ───────────────────────────────────────────────────────────
-function detectType(url: string): StreamType {
-  if (!url) return 'snapshot-fast';
-  if (url.includes('m3u8')) return 'hls';
-  return 'snapshot-fast';
-}
-
-
 //  Single Camera Cell
 // ───────────────────────────────────────────────────────────
 function CameraCell({
@@ -80,61 +71,9 @@ function CameraCell({
   const [loading, setLoading] = useState(true);
   const [imgKey, setImgKey] = useState(Date.now());
 
-  // Refresh intervals
-  let refreshMs = 200; // Default fast snapshot 200ms (5 FPS)
-  if (ch.type === 'dahua-proxy') refreshMs = 2000;
-
-  useEffect(() => {
-    if (ch.type === 'snapshot-fast' || ch.type === 'dahua-proxy') {
-      setErr(false);
-      setLoading(true);
-      const iv = setInterval(() => setImgKey(Date.now()), refreshMs);
-      return () => clearInterval(iv);
-    }
-  }, [ch.type, ch.url, refreshMs]);
-
   useEffect(() => {
     setErr(false);
     setLoading(true);
-    // HLS via native <video> | require hls.js for full support
-    if (ch.url && ch.type === 'hls') {
-      const vid = videoRef.current;
-      if (!vid) return;
-      if (vid.canPlayType('application/vnd.apple.mpegurl')) {
-        vid.src = ch.url;
-        vid.play().catch(() => { });
-      } else {
-        // Dynamically load hls.js from CDN
-        if ((window as any).Hls) {
-          const Hls = (window as any).Hls;
-          if (Hls.isSupported()) {
-            const hls = new Hls({ enableWorker: false });
-            hls.loadSource(ch.url);
-            hls.attachMedia(vid);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-              vid.play().catch(() => { });
-            });
-            hls.on(Hls.Events.ERROR, () => setErr(true));
-            return () => hls.destroy();
-          }
-        } else {
-          // Fallback: load hls.js script
-          const s = document.createElement('script');
-          s.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js';
-          s.onload = () => {
-            const Hls = (window as any).Hls;
-            if (Hls && Hls.isSupported() && vid) {
-              const hls = new Hls({ enableWorker: false });
-              hls.loadSource(ch.url);
-              hls.attachMedia(vid);
-              hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play().catch(() => { }));
-              hls.on(Hls.Events.ERROR, () => setErr(true));
-            }
-          };
-          document.head.appendChild(s);
-        }
-      }
-    }
   }, [ch.url, ch.type]);
 
   const renderStream = () => {
@@ -153,66 +92,21 @@ function CameraCell({
         <div className="cctv-error">
           <i className="fas fa-exclamation-triangle" />
           <span>Gagal memuat stream</span>
-          <button onClick={(e) => { e.stopPropagation(); setErr(false); setLoading(true); }}>
+          <button onClick={(e) => { e.stopPropagation(); setErr(false); setLoading(true); setImgKey(Date.now()); }}>
             <i className="fas fa-redo" /> Retry
           </button>
         </div>
       );
     }
 
-    const type = ch.type === 'hls' ? (detectType(ch.url) !== 'hls' ? detectType(ch.url) : 'hls') : ch.type;
-
-    // DIRECT SNAPSHOT FAST (seperti script setInterval dari user)
-    if (type === 'snapshot-fast') {
-      const snapUrl = ch.url.includes('?') ? `${ch.url}&t=${imgKey}` : `${ch.url}?t=${imgKey}`;
-      return (
-        <img
-          key={imgKey}
-          src={snapUrl}
-          alt={ch.name}
-          style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000', display: 'block' }}
-          onLoad={() => setLoading(false)}
-          onError={() => { setLoading(false); setErr(true); }}
-        />
-      );
-    }
-
-    // DAHUA PROXY — snapshot via /api/cctv-proxy (Legacy fallback)
-    if (type === 'dahua-proxy') {
-      const proxyUrl = ch.url.includes('?') ? `${ch.url}&_t=${imgKey}` : `${ch.url}?_t=${imgKey}`;
-      return (
-        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-          <img
-            key={imgKey}
-            src={proxyUrl}
-            alt={ch.name}
-            style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', background: '#07111e' }}
-            onLoad={() => setLoading(false)}
-            onError={() => { setLoading(false); setErr(true); }}
-          />
-          {/* Timestamp overlay */}
-          <span style={{
-            position: 'absolute', bottom: '28px', right: '6px',
-            fontFamily: 'monospace', fontSize: '0.55rem',
-            color: 'rgba(255,255,0,0.7)', letterSpacing: '0.04em',
-            textShadow: '0 1px 3px rgba(0,0,0,0.9)',
-            pointerEvents: 'none',
-          }}>
-            {new Date().toLocaleTimeString('id-ID')}
-          </span>
-        </div>
-      );
-    }
-
-    // HLS / native video
+    // Dahua MJPEG Stream (Continuous Video)
     return (
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
-        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', background: '#000' }}
-        onCanPlay={() => setLoading(false)}
+      <img
+        key={imgKey}
+        src={`${ch.url}&_t=${imgKey}`}
+        alt={ch.name}
+        style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000', display: 'block' }}
+        onLoad={() => setLoading(false)}
         onError={() => setErr(true)}
       />
     );
@@ -281,19 +175,18 @@ function ChannelSettings({
             <label>URL Stream / Sumber Video</label>
             <input
               value={form.url}
-              onChange={e => setForm(p => ({ ...p, url: e.target.value, type: detectType(e.target.value) }))}
+              onChange={e => setForm(p => ({ ...p, url: e.target.value }))}
               placeholder="https://... (.m3u8 / .mp4 / YouTube / IP cam URL)"
             />
           </div>
           <div className="cctv-field">
             <label>Tipe Stream</label>
-            <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as StreamType }))}>
-              <option value="snapshot-fast">Proxy Snapshot (Default) — Refresh Cepat (200ms)</option>
-              <option value="hls">HLS (.m3u8) — Opsi Cadangan Video Asli</option>
-            </select>
-            <div className="cctv-field-hint">
-              {form.type === 'snapshot-fast' && '⚡ Mode default super cepat & anti blokir. Melalui server proxy otomatis.'}
-              {form.type === 'hls' && '🎥 Video HLS. Jika didukung, ini menghasilkan video paling mulus tapi delay ~10 detik.'}
+            <div style={{ padding: '10px', background: 'rgba(41, 121, 245, 0.1)', border: '1px solid var(--blue)', borderRadius: '8px', color: '#e2e8f0', fontSize: '0.85rem' }}>
+              <strong><i className="fas fa-video"></i> Dahua Video Stream (Sub-stream)</strong>
+              <div style={{ color: 'var(--green)', marginTop: '4px', fontSize: '0.75rem' }}>✓ Mode Video Berkelanjutan Aktif</div>
+            </div>
+            <div className="cctv-field-hint" style={{ marginTop: '8px' }}>
+              Sistem akan membaca aliran video (stream MJPEG) secara langsung dari DVR sehingga bergerak terus tanpa memukul server (Anti Lockout).
             </div>
           </div>
           <div className="cctv-field-toggle">
