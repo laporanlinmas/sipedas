@@ -12,7 +12,7 @@ import Link from 'next/link';
 const DEFAULT_CHANNELS: Channel[] = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   name: `Kamera ${i + 1}`,
-  url: `/api/cctv-proxy?ch=${i + 1}&type=snapshot`,
+  url: `http://publik:publik123@103.109.206.38:80/cgi-bin/snapshot.cgi?channel=${i + 1}`,
   type: 'snapshot' as StreamType,
   location: `Lokasi ${i + 1}`,
   active: true,
@@ -29,7 +29,7 @@ interface Channel {
   active: boolean;
 }
 
-const STORAGE_KEY = 'sipedas_cctv_channels_v9';
+const STORAGE_KEY = 'sipedas_cctv_channels_v10';
 
 function loadChannels(): Channel[] {
   try {
@@ -192,11 +192,11 @@ function ChannelSettings({
           <div className="cctv-field">
             <label>Tipe Stream</label>
             <div style={{ padding: '10px', background: 'rgba(41, 121, 245, 0.1)', border: '1px solid var(--blue)', borderRadius: '8px', color: '#e2e8f0', fontSize: '0.85rem' }}>
-              <strong><i className="fas fa-camera"></i> Proxy Snapshot (3 FPS)</strong>
-              <div style={{ color: 'var(--green)', marginTop: '4px', fontSize: '0.75rem' }}>✓ Mode Cepat Responsif, Tersertifikasi Anti-Blokir Browser</div>
+              <strong><i className="fas fa-camera"></i> Direct Snapshot (3 FPS)</strong>
+              <div style={{ color: 'var(--green)', marginTop: '4px', fontSize: '0.75rem' }}>✓ Gambar Langsung dari DVR</div>
             </div>
             <div className="cctv-field-hint" style={{ marginTop: '8px' }}>
-              Memanggil DVR menggunakan sistem proxy server (Sipedas API) agar browser tidak memblokir username/password dan tidak terkena isu CORS Content-Security.
+              Sistem akan memanggil gambar langsung dari IP CCTV setiap 333ms.
             </div>
           </div>
           <div className="cctv-field-toggle">
