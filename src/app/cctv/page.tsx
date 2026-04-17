@@ -9,28 +9,12 @@ import Link from 'next/link';
 //  IP: 103.109.206.38 | User: publik | Pass: publik123
 // ───────────────────────────────────────────────────────────
 
-// Nama lokasi per-channel (sesuaikan dengan posisi kamera fisik)
-const CHANNEL_LOCATIONS = [
-  'Gerbang Utama',    // CH 1
-  'Parkir Depan',     // CH 2
-  'Lobby',            // CH 3
-  'Koridor Kiri',     // CH 4
-  'Koridor Kanan',    // CH 5
-  'Tangga Utama',     // CH 6
-  'Ruang Server',     // CH 7
-  'Gudang',           // CH 8
-  'Parkir Belakang',  // CH 9
-  'Gerbang Belakang', // CH 10
-  'Pos Satpam',       // CH 11
-  'Area Publik',      // CH 12
-];
-
 const DEFAULT_CHANNELS: Channel[] = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
-  name: `CH ${i + 1} — ${CHANNEL_LOCATIONS[i] || 'Channel ' + (i + 1)}`,
-  url: `http://103.109.206.38:80/cgi-bin/snapshot.cgi?channel=${i + 1}`,
+  name: `Kamera ${i + 1}`,
+  url: `/api/cctv-proxy?ch=${i + 1}&type=snapshot`,
   type: 'snapshot-fast' as StreamType,
-  location: CHANNEL_LOCATIONS[i] || `Lokasi ${i + 1}`,
+  location: `Lokasi ${i + 1}`,
   active: true,
 }));
 
@@ -45,7 +29,7 @@ interface Channel {
   active: boolean;
 }
 
-const STORAGE_KEY = 'sipedas_cctv_channels_v3';
+const STORAGE_KEY = 'sipedas_cctv_channels_v5';
 
 function loadChannels(): Channel[] {
   try {
@@ -74,7 +58,6 @@ function saveChannels(channels: Channel[]) {
 function detectType(url: string): StreamType {
   if (!url) return 'snapshot-fast';
   if (url.includes('m3u8')) return 'hls';
-  if (url.includes('cctv-proxy')) return 'dahua-proxy';
   return 'snapshot-fast';
 }
 
@@ -194,7 +177,7 @@ function CameraCell({
       );
     }
 
-    // DAHUA PROXY — snapshot via /api/cctv-proxy
+    // DAHUA PROXY — snapshot via /api/cctv-proxy (Legacy fallback)
     if (type === 'dahua-proxy') {
       const proxyUrl = ch.url.includes('?') ? `${ch.url}&_t=${imgKey}` : `${ch.url}?_t=${imgKey}`;
       return (
@@ -305,14 +288,12 @@ function ChannelSettings({
           <div className="cctv-field">
             <label>Tipe Stream</label>
             <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as StreamType }))}>
-              <option value="snapshot-fast">Direct Snapshot (Default) — Refresh Cepat (200ms)</option>
+              <option value="snapshot-fast">Proxy Snapshot (Default) — Refresh Cepat (200ms)</option>
               <option value="hls">HLS (.m3u8) — Opsi Cadangan Video Asli</option>
-              <option value="dahua-proxy">Dahua Proxy — Gunakan ini jika error CORS/HTTPS</option>
             </select>
             <div className="cctv-field-hint">
-              {form.type === 'snapshot-fast' && '⚡ Mode ringan & cepat. Refresh 5 kali per detik. Sangat responsif langsung dari DVR.'}
-              {form.type === 'hls' && '🎥 Video HLS Cadangan. Hemat data tapi mungkin beda 10 detik dari aslinya.'}
-              {form.type === 'dahua-proxy' && '🛡️ Bypass server. Resolusi sama tapi difilter Next.js agar tidak diblokir browser.'}
+              {form.type === 'snapshot-fast' && '⚡ Mode default super cepat & anti blokir. Melalui server proxy otomatis.'}
+              {form.type === 'hls' && '🎥 Video HLS. Jika didukung, ini menghasilkan video paling mulus tapi delay ~10 detik.'}
             </div>
           </div>
           <div className="cctv-field-toggle">
