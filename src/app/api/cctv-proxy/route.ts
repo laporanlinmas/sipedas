@@ -65,6 +65,7 @@ async function fetchSnapshot(ch: number, signal: AbortSignal): Promise<Response>
     const r = await fetch(full, {
       method: 'GET',
       headers: { 'Authorization': authHeader, 'User-Agent': 'Mozilla/5.0' },
+      cache: 'no-store', // MENCEGAH NEXT.JS CACHING
       signal,
     });
     if (r.ok) return r;
@@ -76,6 +77,7 @@ async function fetchSnapshot(ch: number, signal: AbortSignal): Promise<Response>
   const challenge = await fetch(full, {
     method: 'GET',
     headers: { 'User-Agent': 'Mozilla/5.0' },
+    cache: 'no-store',
     signal,
   });
 
@@ -92,6 +94,7 @@ async function fetchSnapshot(ch: number, signal: AbortSignal): Promise<Response>
     return fetch(full, {
       method: 'GET',
       headers: { 'Authorization': `Basic ${basic}`, 'User-Agent': 'Mozilla/5.0' },
+      cache: 'no-store',
       signal,
     });
   }
@@ -104,6 +107,7 @@ async function fetchSnapshot(ch: number, signal: AbortSignal): Promise<Response>
   return fetch(full, {
     method: 'GET',
     headers: { 'Authorization': authHeader, 'User-Agent': 'Mozilla/5.0' },
+    cache: 'no-store',
     signal,
   });
 }
