@@ -1,0 +1,30 @@
+/* ═══════════════════════════════════════════════════════
+   FORM AREA
+═══════════════════════════════════════════════════════ */
+.form-area{flex:1;padding:14px 16px 0;display:flex;flex-direction:column;gap:12px;}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rx);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3),0 1px 0 rgba(255,255,255,.04) inset;display:flex;flex-direction:column;height:100%;}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;}
+.ci{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0;}
+.ci-blue{background:var(--bpal);color:#7ab3ff;}
+.ci-gold{background:var(--gdim);color:var(--gold);}
+.card-head h3{font-size:.84rem;font-weight:700;flex:1;}
+.badge-req{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--bpal);border:1px solid var(--bdim);color:#7ab3ff;padding:3px 8px;border-radius:20px;}
+.badge-cnt{font-size:.65rem;color:var(--muted);font-weight:600;background:rgba(255,255,255,.05);padding:3px 8px;border-radius:20px;border:1px solid var(--bdr);}
+.card-body{padding:14px 16px;display:flex;flex-direction:column;flex:1;}
+
+/* ═══════════════════════════════════════════════════════
+   TEXTAREA LAPORAN
+═══════════════════════════════════════════════════════ */
+.lap-input{width:100%;flex:1;min-height:150px;background:rgba(255,255,255,.04);border:1px solid var(--bdr2);border-radius:var(--rl);color:var(--text);font-family:var(--f);font-size:.91rem;line-height:1.65;padding:13px 14px;resize:none;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;}
+.lap-input::placeholder{color:var(--muted);}
+.lap-input:focus{border-color:var(--blueb);box-shadow:0 0 0 3px rgba(41,121,245,.16);background:rgba(26,101,214,.05);}
+.char-row{display:flex;justify-content:flex-end;margin-top:6px;}
+.char-cnt{font-size:.63rem;color:var(--muted);font-family:var(--m);}
+
+/* Light Mode Form Adjustments */
+body.light-mode .card{box-shadow:0 2px 16px rgba(15,23,42,.08),0 1px 0 rgba(255,255,255,.8) inset;}
+body.light-mode .ci-blue{color:var(--txt-blue);}
+body.light-mode .badge-req{color:var(--txt-blue);}
+body.light-mode .badge-cnt{background:rgba(15,23,42,.04);}
+body.light-mode .lap-input{background:var(--input-bg);border-color:var(--bdr2);}
+body.light-mode .lap-input:focus{background:#eff6ff;box-shadow:0 0 0 3px rgba(37,99,235,.1);border-color:var(--blueb);}

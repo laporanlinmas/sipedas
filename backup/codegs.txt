@@ -1,0 +1,113 @@
+function _escapeQueryValue(value) {
+  return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function _cacheGet(key) {
+  var v = CacheService.getScriptCache().get(key);
+  return v || '';
+}
+
+function _cachePut(key, value) {
+  if (!value) return;
+  CacheService.getScriptCache().put(key, value, 21600); // 6 jam
+}
+
+function _getOrCreateFolderId(parentId, folderName) {
+  var cacheKey = 'f:' + parentId + ':' + folderName;
+  var cachedId = _cacheGet(cacheKey);
+  if (cachedId) return cachedId;
+
+  var safeName = _escapeQueryValue(folderName);
+  var q = "name = '" + safeName + "' and '" + parentId + "' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
+  var list = Drive.Files.list({
+    q: q,
+    spaces: 'drive',
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true
+  });
+  var folders = list && list.files ? list.files : [];
+  if (folders.length > 0) {
+    _cachePut(cacheKey, folders[0].id);
+    return folders[0].id;
+  }
+
+  // Lock hanya untuk create-folder supaya cepat namun tetap anti-duplikasi.
+  var lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    var list2 = Drive.Files.list({
+      q: q,
+      spaces: 'drive',
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true
+    });
+    var folders2 = list2 && list2.files ? list2.files : [];
+    if (folders2.length > 0) {
+      _cachePut(cacheKey, folders2[0].id);
+      return folders2[0].id;
+    }
+    var createdId = Drive.Files.create({
+      name: folderName,
+      mimeType: "application/vnd.google-apps.folder",
+      parents: [parentId]
+    }, null, { supportsAllDrives: true }).id;
+    _cachePut(cacheKey, createdId);
+    return createdId;
+  } finally {
+    try { lock.releaseLock(); } catch (e) {}
+  }
+}
+
+function doPost(e) {
+  try {
+    var body = JSON.parse(e.postData.contents || '{}');
+    var action = body.action || 'upload';
+
+    // ============================================================
+    // BRIDGE APPS SCRIPT:
+    // Hanya meneruskan request dari Next.js ke Drive/Sheets.
+    // Hanya upload Drive (izin user) + ping.
+    // Semua logic backend (Sheet, parsing, draft state) dikerjakan di src.
+    // ============================================================
+
+    // --- 1) UPLOAD FOTO (Next.js: upload) ---
+    if (action === 'upload') {
+      if (!body.fileData || !body.fileData.content) throw new Error("fileData.content kosong.");
+      if (!body.folderId) throw new Error("folderId kosong.");
+      var blob = Utilities.newBlob(Utilities.base64Decode(body.fileData.content), body.fileData.mimeType, body.fileData.name);
+      var folderBulan = body.folderBulan || Utilities.formatDate(new Date(), 'Asia/Jakarta', 'MMMM yyyy');
+      var folderTanggal = body.folderName || Utilities.formatDate(new Date(), 'Asia/Jakarta', 'd MMMM yyyy');
+
+      var bulanId = _getOrCreateFolderId(body.folderId, folderBulan);
+      var targetId = _getOrCreateFolderId(bulanId, folderTanggal);
+      var file = Drive.Files.create({ name: body.fileData.name, parents: [targetId] }, blob, { supportsAllDrives: true });
+      try {
+        Drive.Permissions.create({ role: 'reader', type: 'anyone' }, file.id, { supportsAllDrives: true });
+      } catch (permErr) {}
+
+      return response({
+        success: true,
+        url: "https://drive.google.com/file/d/" + file.id + "/view?usp=sharing",
+        linkFile: "https://drive.google.com/file/d/" + file.id + "/view?usp=sharing",
+        id: file.id,
+        folderUrl: "https://drive.google.com/drive/folders/" + targetId
+      });
+    }
+
+    if (action === 'ping') {
+      return response({ success: true });
+    }
+
+    return response({
+      success: false,
+      message: "Action tidak didukung di GAS bridge: " + action
+    });
+
+  } catch (err) {
+    return response({ error: err.toString() });
+  }
+}
+
+function response(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
