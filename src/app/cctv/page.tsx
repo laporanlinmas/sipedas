@@ -68,33 +68,35 @@ function CameraCell({
 }) {
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(true);
-  const imgRef  = useRef<HTMLImageElement>(null);
-  const loadingRef = useRef(true); // useRef to avoid stale closure
+  const imgRef = useRef<HTMLImageElement>(null);
+  const loadingRef = useRef(true);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const setUrl = () => {
+    if (imgRef.current && ch.url) {
+      const sep = ch.url.includes('?') ? '&' : '?';
+      imgRef.current.src = `${ch.url}${sep}_t=${Date.now()}`;
+    }
+  };
 
   useEffect(() => {
-    // Reset state on every channel change
     loadingRef.current = true;
     setLoading(true);
     setErr(false);
+
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     if (!ch.url || !ch.active) {
       setLoading(false);
       return;
     }
 
-    const setUrl = () => {
-      if (imgRef.current) {
-        const sep = ch.url.includes('?') ? '&' : '?';
-        imgRef.current.src = `${ch.url}${sep}_t=${Date.now()}`;
-      }
-    };
-
-    // Set first frame immediately
     setUrl();
 
-    // Then repeat at 3 FPS
-    const iv = setInterval(setUrl, 333);
-    return () => clearInterval(iv);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ch.url, ch.active]);
 
   const handleLoad = () => {
@@ -102,12 +104,21 @@ function CameraCell({
       loadingRef.current = false;
       setLoading(false);
     }
+    // Schedule NEXT frame only AFTER current finishes loading
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(setUrl, 333);
   };
 
   const handleError = () => {
-    loadingRef.current = false;
-    setLoading(false);
-    setErr(true);
+    if (loadingRef.current) {
+      loadingRef.current = false;
+      setLoading(false);
+      setErr(true);
+    } else {
+      // Jika nyangkut saat sudah berjalan, coba refresh pelan-pelan tanpa error layarnya
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(setUrl, 2000);
+    }
   };
 
   const renderStream = () => {
