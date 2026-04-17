@@ -69,21 +69,35 @@ function CameraCell({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [imgKey, setImgKey] = useState(Date.now());
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // Set loading false setelah gambar pertama berhasil
+  const [firstLoaded, setFirstLoaded] = useState(false);
 
   const refreshMs = 333; // ~3 FPS
 
   useEffect(() => {
     setErr(false);
     setLoading(true);
+    setFirstLoaded(false);
 
-    // Interval untuk refresh gambar 3 FPS
+    if (!ch.url || !ch.active) return;
+
+    // Langsung set src gambar pertama
+    if (imgRef.current) {
+      imgRef.current.src = `${ch.url}&t=${Date.now()}`;
+    }
+
+    // Interval: update src langsung via ref tanpa React re-render
     const iv = setInterval(() => {
-      setImgKey(Date.now());
+      if (imgRef.current) {
+        imgRef.current.src = `${ch.url}&t=${Date.now()}`;
+      }
     }, refreshMs);
 
     return () => clearInterval(iv);
-  }, [ch.url, ch.type]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ch.url, ch.active]);
 
   const renderStream = () => {
     if (!ch.url || !ch.active) {
@@ -109,14 +123,18 @@ function CameraCell({
     }
 
     // Direct Snapshot Refresh (~3 FPS)
-    const snapUrl = ch.url.includes('?') ? `${ch.url}&t=${imgKey}` : `${ch.url}?t=${imgKey}`;
+    // PENTING: TIDAK pakai key={imgKey} agar img tidak di-unmount tiap tick
     return (
       <img
-        key={imgKey}
-        src={snapUrl}
+        ref={imgRef}
         alt={ch.name}
         style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000', display: 'block' }}
-        onLoad={() => setLoading(false)}
+        onLoad={() => {
+          if (!firstLoaded) {
+            setFirstLoaded(true);
+            setLoading(false);
+          }
+        }}
         onError={() => { setLoading(false); setErr(true); }}
       />
     );
