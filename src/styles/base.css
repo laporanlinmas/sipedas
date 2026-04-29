@@ -1,0 +1,193 @@
+:root {
+  --navy: #060d1a;
+  --navy2: #0b1628;
+  --navy3: #0f1e35;
+  --card: #111f38;
+  --card2: #162844;
+  --blue: #1a65d6;
+  --blueb: #2979f5;
+  --bdim: rgba(26, 101, 214, .22);
+  --bpal: rgba(26, 101, 214, .10);
+  --gold: #f0b429;
+  --gdim: rgba(240, 180, 41, .16);
+  --gpal: rgba(240, 180, 41, .08);
+  --green: #10b981;
+  --grdim: rgba(16, 185, 129, .16);
+  --gpal2: rgba(16, 185, 129, .08);
+  --red: #ef4444;
+  --rdim: rgba(239, 68, 68, .16);
+  --amber: #f59e0b;
+  --adim: rgba(245, 158, 11, .14);
+  --purple: #7c3aed;
+  --pdim: rgba(124, 58, 237, .18);
+  --ppal: rgba(124, 58, 237, .10);
+  --text: #eef2ff;
+  --mid: #94a3c4;
+  --muted: #4a6280;
+  --bdr: rgba(255, 255, 255, .06);
+  --bdr2: rgba(255, 255, 255, .10);
+  --rx: 22px;
+  --rl: 16px;
+  --rm: 12px;
+  --rs: 8px;
+  --f: 'Space Grotesk', sans-serif;
+  --m: 'JetBrains Mono', monospace;
+  --sb: env(safe-area-inset-bottom, 0px);
+  --st: env(safe-area-inset-top, 0px);
+  /* Accent text colors (dark mode default) */
+  --txt-blue: #7ab3ff;
+  --txt-green: #34d399;
+  --input-bg: rgba(255, 255, 255, .04);
+  --shd: 0 4px 20px rgba(0, 0, 0, .35);
+}
+
+/* ═══════════════════════════════════════════════════════
+   LIGHT MODE OVERRIDES — Professional & Premium
+═══════════════════════════════════════════════════════ */
+body.light-mode {
+  --navy: #f8fafc;
+  --navy2: #ffffff;
+  --navy3: #f1f5f9;
+  --card: #ffffff;
+  --card2: #f8fafc;
+  --blue: #2563eb;
+  --blueb: #3b82f6;
+  --bdim: rgba(37, 99, 235, .15);
+  --bpal: rgba(59, 130, 246, .08);
+  --gold: #d97706;
+  --gdim: rgba(217, 119, 6, .15);
+  --gpal: rgba(217, 119, 6, .08);
+  --green: #059669;
+  --grdim: rgba(5, 150, 105, .15);
+  --gpal2: rgba(5, 150, 105, .08);
+  --red: #dc2626;
+  --rdim: rgba(220, 38, 38, .12);
+  --purple: #7c3aed;
+  --pdim: rgba(124, 58, 237, .15);
+  --ppal: rgba(124, 58, 237, .08);
+  --text: #0f172a;
+  --mid: #475569;
+  --muted: #64748b;
+  --bdr: rgba(15, 23, 42, .1);
+  --bdr2: rgba(15, 23, 42, .15);
+  --glow-color: rgba(37, 99, 235, .06);
+  --shd: 0 4px 15px rgba(15, 23, 42, .06);
+  /* Accent text (light mode) */
+  --txt-blue: #1d4ed8;
+  --txt-green: #15803d;
+  --input-bg: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--f);
+  background: var(--navy);
+  color: var(--text);
+  min-height: 100dvh;
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  transition: background-color .3s ease, color .3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BACKGROUND DECORATIONS
+═══════════════════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, .018) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+body.light-mode::before {
+  background-image: radial-gradient(rgba(15, 23, 42, .025) 1px, transparent 1px);
+}
+
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(26, 101, 214, .20) 0%, transparent 65%), radial-gradient(ellipse 40% 30% at 90% 90%, rgba(240, 180, 41, .07) 0%, transparent 60%);
+}
+
+body.light-mode .bg-glow {
+  background: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(37, 99, 235, .06) 0%, transparent 65%);
+}
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT WRAPPER
+═══════════════════════════════════════════════════════ */
+.wrap {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(28px + var(--sb));
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  transition: max-width 0.3s ease;
+}
+
+/* Tablet — melebar, single column */
+@media (min-width: 640px) {
+  .wrap {
+    max-width: 720px;
+    padding: 0 24px;
+  }
+}
+
+/* Desktop — two-column layout fluid */
+@media (min-width: 900px) {
+  .wrap {
+    max-width: 100%;
+    padding: 0 32px;
+    padding-bottom: 40px;
+  }
+
+  .form-area {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .submit-wrap {
+    padding: 0 32px 0;
+  }
+}
+
+/* Wide desktop fluid */
+@media (min-width: 1200px) {
+  .wrap {
+    max-width: 1400px;
+  }
+
+  .form-area {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+}
